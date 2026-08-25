@@ -197,11 +197,13 @@ mcq = load_columns(
     ]
 )
 
-kidney = load_columns(
-    "P_KIQ_U.xpt",
+bpq = load_columns(
+    "P_BPQ.xpt",
     [
         "SEQN",
-        "KIQ022",
+        "BPQ020",
+        "BPQ030",
+        "BPQ050A",
     ]
 )
 
@@ -239,7 +241,7 @@ datasets = [
     biopro,
     diq,
     mcq,
-    kidney,
+    bpq,
     smoking,
     activity,
 ]
@@ -346,9 +348,39 @@ patients["CVD"] = combine_binary_conditions(
 # 8. KIDNEY DISEASE LABEL
 # ============================================================
 
-patients["KIDNEY"] = binary_yes_no(
-    patients["KIQ022"]
-)
+# ============================================================
+# HYPERTENSION LABEL
+# ============================================================
+
+# BPQ020:
+# 1 = Ever told by clinician they had hypertension
+# 2 = Never told
+#
+# BPQ030:
+# 1 = Told on 2 or more different visits
+#
+# BPQ050A:
+# 1 = Currently taking prescribed hypertension medicine
+#
+# Target definition:
+# Positive = repeated diagnosis OR current treatment
+# Negative = never told they had hypertension
+# Other uncertain cases = missing
+
+patients["HYPERTENSION"] = np.nan
+
+# Clear negative
+patients.loc[
+    patients["BPQ020"] == 2.0,
+    "HYPERTENSION"
+] = 0.0
+
+# Strong positive evidence
+patients.loc[
+    (patients["BPQ030"] == 1.0)
+    | (patients["BPQ050A"] == 1.0),
+    "HYPERTENSION"
+] = 1.0
 
 
 # ============================================================
@@ -472,10 +504,10 @@ master_columns = [
     "SMOKING_STATUS",
     "PHYSICAL_ACTIVITY_ANY",
 
-    # Targets
+     # Targets
     "DIABETES",
+    "HYPERTENSION",
     "CVD",
-    "KIDNEY",
 ]
 
 master = patients[
@@ -508,8 +540,8 @@ print(
 
 target_columns = [
     "DIABETES",
+    "HYPERTENSION",
     "CVD",
-    "KIDNEY",
 ]
 
 complete_labels = master.dropna(
@@ -666,8 +698,8 @@ print(
 )
 
 print(
-    "Invalid kidney labels:",
-    (~complete_labels["KIDNEY"].isin([0, 1])).sum()
+    "Invalid hypertension labels:",
+    (~complete_labels["HYPERTENSION"].isin([0, 1])).sum()
 )
 
 

@@ -82,6 +82,12 @@ EXPECTED = {
         "PAQ650",
         "PAQ665",
     ],
+    "P_BPQ.xpt": [
+       "SEQN",
+       "BPQ020",
+       "BPQ030",
+       "BPQ050A",
+    ],
 }
 
 
@@ -132,6 +138,11 @@ diagnosis_variables = {
     ],
 
     "P_KIQ_U.xpt": ["KIQ022"],
+    "P_BPQ.xpt": [
+       "BPQ020",
+       "BPQ030",
+       "BPQ050A",
+    ],
 }
 
 

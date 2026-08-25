@@ -36,11 +36,11 @@ for file in files:
 
 print("\n" + "=" * 72)
 
-if len(files) == 12 and all_valid:
-    print("ALL 12 NHANES FILES VERIFIED SUCCESSFULLY.")
+if len(files) == 13 and all_valid:
+    print("ALL 13 NHANES FILES VERIFIED SUCCESSFULLY.")
 else:
     print("NHANES VERIFICATION FAILED.")
-    print(f"Expected files: 12")
+    print(f"Expected files: 13")
     print(f"Files found   : {len(files)}")
 
 print("=" * 72)

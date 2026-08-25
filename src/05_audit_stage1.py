@@ -34,8 +34,8 @@ PROTECTED_ATTRIBUTE = "SEX"
 
 TARGETS = [
     "DIABETES",
+    "HYPERTENSION",
     "CVD",
-    "KIDNEY",
 ]
 
 
@@ -123,13 +123,13 @@ print("=" * 78)
 
 print("\nPattern meaning:")
 print("000 = none")
+print("001 = CVD only")
+print("010 = hypertension only")
+print("011 = hypertension + CVD")
 print("100 = diabetes only")
-print("010 = CVD only")
-print("001 = kidney only")
-print("110 = diabetes + CVD")
-print("101 = diabetes + kidney")
-print("011 = CVD + kidney")
-print("111 = all three\n")
+print("101 = diabetes + CVD")
+print("110 = diabetes + hypertension")
+print("111 = diabetes + hypertension + CVD\n")
 
 for pattern, count in pattern_counts.items():
 
