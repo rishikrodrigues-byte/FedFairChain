@@ -535,11 +535,37 @@ print(
 
 
 # ============================================================
-# SELECT BEST ORDER
+# SELECT BEST DIABETES-FIRST ORDER
 # ============================================================
 
+# Project design constraint:
+# Diabetes must always be the first label in the
+# final classifier chain.
+#
+# We still evaluate all six orders for research,
+# but final model selection is restricted to
+# Diabetes-first chains.
+
+eligible_df = (
+    summary_df[
+        summary_df["order"].str.startswith("D ->")
+    ]
+    .reset_index(drop=True)
+)
+
+print("\n" + "=" * 80)
+print("DIABETES-FIRST CHAIN CANDIDATES")
+print("=" * 80)
+
+print(
+    eligible_df.to_string(
+        index=False,
+        float_format=lambda x: f"{x:.4f}"
+    )
+)
+
 best_order_name = (
-    summary_df.iloc[0]["order"]
+    eligible_df.iloc[0]["order"]
 )
 
 best_run = None
@@ -552,6 +578,12 @@ for run in chain_runs:
 
         best_run = run
         break
+
+
+if best_run is None:
+    raise RuntimeError(
+        "Could not find selected Diabetes-first chain."
+    )
 
 
 best_order = best_run["order"]
@@ -568,10 +600,13 @@ print(
 )
 
 print(
-    "Selection criterion: "
-    "Highest validation Macro PR-AUC"
+    "Constraint: DIABETES must be first"
 )
 
+print(
+    "Selection criterion: Highest validation "
+    "Macro PR-AUC among Diabetes-first chains"
+)
 
 # ============================================================
 # THRESHOLD SEARCH
