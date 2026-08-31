@@ -9,4 +9,4 @@ data/processed/
 
 models/
 results/*.png
-results/*.csv
+results/*.csvresults/*.json
