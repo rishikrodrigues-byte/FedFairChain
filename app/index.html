@@ -1,0 +1,1300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>FedFairChain</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family:
+                Inter,
+                system-ui,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                sans-serif;
+
+            background: #f5f7fb;
+            color: #172033;
+        }
+
+        .topbar {
+            background: #ffffff;
+            border-bottom: 1px solid #e4e8f0;
+            padding: 18px 28px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .brand {
+            font-size: 22px;
+            font-weight: 750;
+        }
+
+        .brand span {
+            color: #3164e0;
+        }
+
+        .research-badge {
+            font-size: 12px;
+            background: #eef3ff;
+            color: #2855c5;
+            padding: 7px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .container {
+            max-width: 1180px;
+            margin: 30px auto;
+            padding: 0 20px 60px;
+        }
+
+        .hero {
+            background: white;
+            border: 1px solid #e5e9f1;
+            border-radius: 16px;
+            padding: 28px;
+            margin-bottom: 24px;
+        }
+
+        .hero h1 {
+            margin: 0 0 8px;
+            font-size: 30px;
+        }
+
+        .hero p {
+            margin: 0;
+            color: #637083;
+            line-height: 1.6;
+        }
+
+        .chain {
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .chain-item {
+            background: #eef3ff;
+            color: #2855c5;
+            font-weight: 700;
+            border-radius: 9px;
+            padding: 8px 13px;
+            font-size: 13px;
+        }
+
+        .arrow {
+            color: #8b96a8;
+            font-weight: bold;
+        }
+
+        .card {
+            background: white;
+            border: 1px solid #e5e9f1;
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 22px;
+        }
+
+        .card-title {
+            font-size: 19px;
+            font-weight: 750;
+            margin-bottom: 4px;
+        }
+
+        .card-subtitle {
+            font-size: 13px;
+            color: #7a8596;
+            margin-bottom: 22px;
+        }
+
+        .section-title {
+            margin-top: 22px;
+            margin-bottom: 14px;
+            font-size: 14px;
+            color: #334055;
+            font-weight: 750;
+            border-bottom: 1px solid #edf0f5;
+            padding-bottom: 8px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns:
+                repeat(auto-fit, minmax(215px, 1fr));
+            gap: 16px;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        label {
+            font-size: 13px;
+            font-weight: 650;
+            color: #3e495c;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 11px 12px;
+            border-radius: 8px;
+            border: 1px solid #cfd6e2;
+            background: #ffffff;
+            color: #172033;
+            font-size: 14px;
+            outline: none;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: #3164e0;
+            box-shadow: 0 0 0 3px rgba(49, 100, 224, 0.10);
+        }
+
+        .unit {
+            font-size: 11px;
+            color: #8a94a5;
+        }
+
+        .diagnosis-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        .info-box {
+            background: #f7f9fc;
+            border: 1px solid #e4e8ef;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 18px;
+            font-size: 13px;
+            color: #657186;
+            line-height: 1.5;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            border: 0;
+            border-radius: 9px;
+            padding: 12px 22px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .primary {
+            background: #3164e0;
+            color: white;
+        }
+
+        .primary:hover {
+            background: #2856c7;
+        }
+
+        .secondary {
+            background: #eef1f6;
+            color: #3c4759;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        #loading {
+            display: none;
+            text-align: center;
+            margin: 25px 0;
+            color: #5f6e83;
+            font-weight: 600;
+        }
+
+        #errorBox {
+            display: none;
+            background: #fff0f0;
+            border: 1px solid #f2bcbc;
+            color: #a52c2c;
+            padding: 14px;
+            border-radius: 10px;
+            margin-top: 18px;
+        }
+
+        #results {
+            display: none;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns:
+                repeat(3, 1fr);
+            gap: 18px;
+        }
+
+        .result-card {
+            border: 1px solid #e4e8f0;
+            border-radius: 13px;
+            overflow: hidden;
+            background: white;
+        }
+
+        .result-header {
+            padding: 17px;
+            border-bottom: 1px solid #edf0f5;
+        }
+
+        .result-disease {
+            font-weight: 800;
+            font-size: 16px;
+        }
+
+        .result-body {
+            padding: 18px;
+        }
+
+        .probability {
+            font-size: 34px;
+            font-weight: 800;
+            margin: 4px 0;
+        }
+
+        .muted {
+            color: #788497;
+            font-size: 12px;
+        }
+
+        .status {
+            display: inline-block;
+            margin-top: 8px;
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 750;
+        }
+
+        .status-positive {
+            background: #ffebeb;
+            color: #bc3333;
+        }
+
+        .status-negative {
+            background: #e9f8ef;
+            color: #297748;
+        }
+
+        .status-known {
+            background: #eef3ff;
+            color: #2855c5;
+        }
+
+        .subheading {
+            margin-top: 19px;
+            margin-bottom: 9px;
+            font-size: 12px;
+            font-weight: 800;
+            color: #546075;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        .contributor {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            padding: 7px 0;
+            border-bottom: 1px solid #f0f2f6;
+            font-size: 12px;
+        }
+
+        .increase {
+            color: #b94242;
+        }
+
+        .decrease {
+            color: #27734b;
+        }
+
+        .context-item {
+            font-size: 12px;
+            padding: 6px 0;
+            color: #596679;
+        }
+
+        .disclaimer {
+            margin-top: 24px;
+            padding: 17px;
+            border-radius: 11px;
+            background: #fff9e9;
+            border: 1px solid #efe1ad;
+            color: #746329;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 25px;
+            color: #8c96a5;
+            font-size: 12px;
+        }
+
+        @media (max-width: 850px) {
+            .result-grid,
+            .diagnosis-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .topbar {
+                padding: 15px 18px;
+            }
+
+            .hero h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="topbar">
+    <div class="brand">
+        Fed<span>Fair</span>Chain
+    </div>
+
+    <div class="research-badge">
+        Research Prototype
+    </div>
+</div>
+
+
+<div class="container">
+
+    <div class="hero">
+
+        <h1>
+            Multi-Label Comorbidity Prediction
+        </h1>
+
+        <p>
+            Federated, fairness-aware and explainable prediction
+            for Diabetes, Cardiovascular Disease and Hypertension.
+        </p>
+
+        <div class="chain">
+            <span class="chain-item">DIABETES</span>
+            <span class="arrow">→</span>
+            <span class="chain-item">CVD</span>
+            <span class="arrow">→</span>
+            <span class="chain-item">HYPERTENSION</span>
+        </div>
+
+    </div>
+
+
+    <form id="patientForm">
+
+        <div class="card">
+
+            <div class="card-title">
+                Patient Information
+            </div>
+
+            <div class="card-subtitle">
+                Enter the available clinical and lifestyle values.
+            </div>
+
+
+            <div class="section-title">
+                Demographic & Body Measurements
+            </div>
+
+            <div class="grid">
+
+                <div class="field">
+                    <label>Age *</label>
+
+                    <input
+                        id="AGE"
+                        type="number"
+                        min="20"
+                        max="80"
+                        step="1"
+                        required
+                    >
+
+                    <span class="unit">years</span>
+                </div>
+
+
+                <div class="field">
+                    <label>BMI</label>
+
+                    <input
+                        id="BMI"
+                        type="number"
+                        min="14"
+                        max="93"
+                        step="0.1"
+                    >
+
+                    <span class="unit">kg/m²</span>
+                </div>
+
+
+                <div class="field">
+                    <label>Waist Circumference</label>
+
+                    <input
+                        id="WAIST_CM"
+                        type="number"
+                        min="55"
+                        max="180"
+                        step="0.1"
+                    >
+
+                    <span class="unit">cm</span>
+                </div>
+
+            </div>
+
+
+            <div class="section-title">
+                Blood Pressure
+            </div>
+
+            <div class="grid">
+
+                <div class="field">
+                    <label>Mean Systolic BP</label>
+
+                    <input
+                        id="SBP_MEAN"
+                        type="number"
+                        min="70"
+                        max="220"
+                        step="0.1"
+                    >
+
+                    <span class="unit">mmHg</span>
+                </div>
+
+
+                <div class="field">
+                    <label>Mean Diastolic BP</label>
+
+                    <input
+                        id="DBP_MEAN"
+                        type="number"
+                        min="35"
+                        max="145"
+                        step="0.1"
+                    >
+
+                    <span class="unit">mmHg</span>
+                </div>
+
+            </div>
+
+
+            <div class="section-title">
+                Laboratory Measurements
+            </div>
+
+            <div class="grid">
+
+                <div class="field">
+                    <label>HbA1c</label>
+                    <input id="HBA1C" type="number" min="2.5" max="17" step="0.1">
+                    <span class="unit">%</span>
+                </div>
+
+                <div class="field">
+                    <label>Serum Glucose</label>
+                    <input id="SERUM_GLUCOSE" type="number" min="35" max="650" step="0.1">
+                    <span class="unit">mg/dL</span>
+                </div>
+
+                <div class="field">
+                    <label>Total Cholesterol</label>
+                    <input id="TOTAL_CHOLESTEROL" type="number" min="60" max="450" step="0.1">
+                    <span class="unit">mg/dL</span>
+                </div>
+
+                <div class="field">
+                    <label>HDL Cholesterol</label>
+                    <input id="HDL_CHOLESTEROL" type="number" min="5" max="190" step="0.1">
+                    <span class="unit">mg/dL</span>
+                </div>
+
+                <div class="field">
+                    <label>Creatinine</label>
+                    <input id="CREATININE" type="number" min="0.2" max="15" step="0.01">
+                    <span class="unit">mg/dL</span>
+                </div>
+
+                <div class="field">
+                    <label>BUN</label>
+                    <input id="BUN" type="number" min="1" max="80" step="0.1">
+                    <span class="unit">mg/dL</span>
+                </div>
+
+                <div class="field">
+                    <label>Albumin</label>
+                    <input id="ALBUMIN" type="number" min="2" max="5.5" step="0.1">
+                    <span class="unit">g/dL</span>
+                </div>
+
+                <div class="field">
+                    <label>Uric Acid</label>
+                    <input id="URIC_ACID" type="number" min="0.5" max="16" step="0.1">
+                    <span class="unit">mg/dL</span>
+                </div>
+
+            </div>
+
+
+            <div class="section-title">
+                Lifestyle
+            </div>
+
+            <div class="grid">
+
+                <div class="field">
+                    <label>Smoking Status</label>
+
+                    <select id="SMOKING_STATUS">
+                        <option value="">Unknown</option>
+                        <option value="0">Never smoker</option>
+                        <option value="1">Former smoker</option>
+                        <option value="2">Current smoker</option>
+                    </select>
+                </div>
+
+
+                <div class="field">
+                    <label>Physical Activity</label>
+
+                    <select id="PHYSICAL_ACTIVITY_ANY">
+                        <option value="">Unknown</option>
+                        <option value="1">Yes</option>
+                        <option value="0">No</option>
+                    </select>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="card-title">
+                Known Diagnoses
+            </div>
+
+            <div class="card-subtitle">
+                Provide a diagnosis only when it is already known.
+                Otherwise select Unknown.
+            </div>
+
+
+            <div class="diagnosis-grid">
+
+                <div class="field">
+
+                    <label>Diabetes</label>
+
+                    <select id="known_diabetes">
+                        <option value="unknown">Unknown</option>
+                        <option value="yes">Known Positive</option>
+                        <option value="no">Known Negative</option>
+                    </select>
+
+                </div>
+
+
+                <div class="field">
+
+                    <label>Cardiovascular Disease</label>
+
+                    <select id="known_cvd">
+                        <option value="unknown">Unknown</option>
+                        <option value="yes">Known Positive</option>
+                        <option value="no">Known Negative</option>
+                    </select>
+
+                </div>
+
+
+                <div class="field">
+
+                    <label>Hypertension</label>
+
+                    <select id="known_hypertension">
+                        <option value="unknown">Unknown</option>
+                        <option value="yes">Known Positive</option>
+                        <option value="no">Known Negative</option>
+                    </select>
+
+                </div>
+
+            </div>
+
+
+            <div class="info-box">
+                A known diagnosis is not predicted again.
+                Its known positive or negative value is inserted into
+                the classifier chain and may influence later predictions.
+            </div>
+
+
+            <div class="buttons">
+
+                <button
+                    type="button"
+                    class="secondary"
+                    onclick="fillExample()"
+                >
+                    Fill Example
+                </button>
+
+                <button
+                    id="analyzeButton"
+                    type="submit"
+                    class="primary"
+                >
+                    Analyze Patient
+                </button>
+
+            </div>
+
+
+            <div id="errorBox"></div>
+
+        </div>
+
+    </form>
+
+
+    <div id="loading">
+        Running FedFairChain analysis...
+    </div>
+
+
+    <div id="results">
+
+        <div class="card">
+
+            <div class="card-title">
+                FedFairChain Results
+            </div>
+
+            <div class="card-subtitle">
+                Disease predictions and model-level explanations.
+            </div>
+
+            <div
+                id="resultGrid"
+                class="result-grid"
+            ></div>
+
+            <div class="disclaimer">
+                <strong>Important:</strong>
+                This is a research prototype.
+                Predictions represent outputs of the trained machine-learning
+                model and are not a clinical diagnosis.
+                SHAP values describe model behavior and should not be
+                interpreted as causal medical effects.
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <footer>
+        FedFairChain · Federated Multi-Label Comorbidity Prediction
+    </footer>
+
+</div>
+
+
+<script>
+
+const numericFields = [
+    "AGE",
+    "BMI",
+    "WAIST_CM",
+    "SBP_MEAN",
+    "DBP_MEAN",
+    "HBA1C",
+    "TOTAL_CHOLESTEROL",
+    "HDL_CHOLESTEROL",
+    "CREATININE",
+    "BUN",
+    "ALBUMIN",
+    "URIC_ACID",
+    "SERUM_GLUCOSE"
+];
+
+
+function getNumber(id) {
+
+    const value =
+        document.getElementById(id).value;
+
+    if (value === "") {
+        return null;
+    }
+
+    return Number(value);
+}
+
+
+function getIntegerOrNull(id) {
+
+    const value =
+        document.getElementById(id).value;
+
+    if (value === "") {
+        return null;
+    }
+
+    return parseInt(value);
+}
+
+
+function fillExample() {
+
+    const example = {
+        AGE: 55,
+        BMI: 31.2,
+        WAIST_CM: 104,
+        SBP_MEAN: 148,
+        DBP_MEAN: 92,
+        HBA1C: 7.1,
+        TOTAL_CHOLESTEROL: 215,
+        HDL_CHOLESTEROL: 42,
+        CREATININE: 0.95,
+        BUN: 16,
+        ALBUMIN: 4.1,
+        URIC_ACID: 6.2,
+        SERUM_GLUCOSE: 142
+    };
+
+
+    for (
+        const [key, value]
+        of Object.entries(example)
+    ) {
+
+        document.getElementById(key).value =
+            value;
+    }
+
+
+    document.getElementById(
+        "SMOKING_STATUS"
+    ).value = "1";
+
+
+    document.getElementById(
+        "PHYSICAL_ACTIVITY_ANY"
+    ).value = "1";
+
+
+    document.getElementById(
+        "known_diabetes"
+    ).value = "unknown";
+
+
+    document.getElementById(
+        "known_cvd"
+    ).value = "unknown";
+
+
+    document.getElementById(
+        "known_hypertension"
+    ).value = "unknown";
+}
+
+
+function formatFeature(name) {
+
+    const mapping = {
+        AGE: "Age",
+        BMI: "BMI",
+        WAIST_CM: "Waist Circumference",
+        SBP_MEAN: "Systolic BP",
+        DBP_MEAN: "Diastolic BP",
+        HBA1C: "HbA1c",
+        TOTAL_CHOLESTEROL: "Total Cholesterol",
+        HDL_CHOLESTEROL: "HDL Cholesterol",
+        CREATININE: "Creatinine",
+        BUN: "BUN",
+        ALBUMIN: "Albumin",
+        URIC_ACID: "Uric Acid",
+        SERUM_GLUCOSE: "Serum Glucose",
+        SMOKING_STATUS: "Smoking Status",
+        PHYSICAL_ACTIVITY_ANY: "Physical Activity",
+        DIABETES_CONTEXT: "Diabetes Context",
+        CVD_CONTEXT: "CVD Context"
+    };
+
+    return mapping[name] || name;
+}
+
+
+function formatDisease(target) {
+
+    if (target === "DIABETES") {
+        return "Diabetes";
+    }
+
+    if (target === "CVD") {
+        return "Cardiovascular Disease";
+    }
+
+    if (target === "HYPERTENSION") {
+        return "Hypertension";
+    }
+
+    return target;
+}
+
+
+function createContextHTML(context) {
+
+    if (!context || context.length === 0) {
+
+        return `
+            <div class="muted">
+                No previous chain context.
+            </div>
+        `;
+    }
+
+
+    return context.map(item => {
+
+        const value =
+            item.value === 1
+            ? "Positive"
+            : "Negative";
+
+        return `
+            <div class="context-item">
+                ${formatDisease(item.target)}
+                =
+                <strong>${value}</strong>
+                (${item.source})
+            </div>
+        `;
+
+    }).join("");
+}
+
+
+function createExplanationHTML(explanations) {
+
+    if (
+        !explanations
+        ||
+        explanations.length === 0
+    ) {
+
+        return `
+            <div class="muted">
+                No model explanation because
+                this condition was supplied as known.
+            </div>
+        `;
+    }
+
+
+    return explanations.map(item => {
+
+        const cls =
+            item.direction === "increases"
+            ? "increase"
+            : "decrease";
+
+
+        const arrow =
+            item.direction === "increases"
+            ? "↑"
+            : "↓";
+
+
+        return `
+            <div class="contributor">
+
+                <span>
+                    ${formatFeature(item.feature)}
+                </span>
+
+                <span class="${cls}">
+                    ${arrow}
+                    ${Math.abs(
+                        item.shap_value
+                    ).toFixed(3)}
+                </span>
+
+            </div>
+        `;
+
+    }).join("");
+}
+
+
+function createResultCard(
+    target,
+    result
+) {
+
+    let mainResult = "";
+    let statusClass = "";
+
+
+    if (result.source === "known") {
+
+        statusClass = "status-known";
+
+        mainResult = `
+            <div class="muted">
+                Known diagnosis
+            </div>
+
+            <div class="probability">
+                ${result.known_status}
+            </div>
+
+            <span class="status ${statusClass}">
+                Supplied by user
+            </span>
+        `;
+
+    } else {
+
+        statusClass =
+            result.prediction === "Positive"
+            ? "status-positive"
+            : "status-negative";
+
+
+        mainResult = `
+            <div class="muted">
+                Predicted probability
+            </div>
+
+            <div class="probability">
+                ${result.probability_percent.toFixed(2)}%
+            </div>
+
+            <span class="status ${statusClass}">
+                ${result.prediction}
+            </span>
+
+            <div class="muted" style="margin-top:9px;">
+                Decision threshold:
+                ${(result.threshold * 100).toFixed(0)}%
+            </div>
+        `;
+    }
+
+
+    return `
+        <div class="result-card">
+
+            <div class="result-header">
+                <div class="result-disease">
+                    ${formatDisease(target)}
+                </div>
+            </div>
+
+
+            <div class="result-body">
+
+                ${mainResult}
+
+
+                <div class="subheading">
+                    Chain Context
+                </div>
+
+                ${createContextHTML(
+                    result.context_used
+                )}
+
+
+                <div class="subheading">
+                    Main Model Contributors
+                </div>
+
+                ${createExplanationHTML(
+                    result.explanation
+                )}
+
+            </div>
+
+        </div>
+    `;
+}
+
+
+document
+.getElementById("patientForm")
+.addEventListener(
+    "submit",
+    async function(event) {
+
+        event.preventDefault();
+
+
+        const button =
+            document.getElementById(
+                "analyzeButton"
+            );
+
+        const loading =
+            document.getElementById(
+                "loading"
+            );
+
+        const errorBox =
+            document.getElementById(
+                "errorBox"
+            );
+
+        const results =
+            document.getElementById(
+                "results"
+            );
+
+
+        errorBox.style.display =
+            "none";
+
+        results.style.display =
+            "none";
+
+        loading.style.display =
+            "block";
+
+        button.disabled =
+            true;
+
+
+        const payload = {
+
+            AGE:
+                getNumber("AGE"),
+
+            BMI:
+                getNumber("BMI"),
+
+            WAIST_CM:
+                getNumber("WAIST_CM"),
+
+            SBP_MEAN:
+                getNumber("SBP_MEAN"),
+
+            DBP_MEAN:
+                getNumber("DBP_MEAN"),
+
+            HBA1C:
+                getNumber("HBA1C"),
+
+            TOTAL_CHOLESTEROL:
+                getNumber(
+                    "TOTAL_CHOLESTEROL"
+                ),
+
+            HDL_CHOLESTEROL:
+                getNumber(
+                    "HDL_CHOLESTEROL"
+                ),
+
+            CREATININE:
+                getNumber("CREATININE"),
+
+            BUN:
+                getNumber("BUN"),
+
+            ALBUMIN:
+                getNumber("ALBUMIN"),
+
+            URIC_ACID:
+                getNumber("URIC_ACID"),
+
+            SERUM_GLUCOSE:
+                getNumber(
+                    "SERUM_GLUCOSE"
+                ),
+
+            SMOKING_STATUS:
+                getIntegerOrNull(
+                    "SMOKING_STATUS"
+                ),
+
+            PHYSICAL_ACTIVITY_ANY:
+                getIntegerOrNull(
+                    "PHYSICAL_ACTIVITY_ANY"
+                ),
+
+            known_diabetes:
+                document.getElementById(
+                    "known_diabetes"
+                ).value,
+
+            known_cvd:
+                document.getElementById(
+                    "known_cvd"
+                ).value,
+
+            known_hypertension:
+                document.getElementById(
+                    "known_hypertension"
+                ).value
+        };
+
+
+        try {
+
+            const response =
+                await fetch(
+                    "/predict",
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body:
+                            JSON.stringify(
+                                payload
+                            )
+                    }
+                );
+
+
+            const data =
+                await response.json();
+
+
+            if (!response.ok) {
+
+                let message =
+                    "Prediction failed.";
+
+                if (data.detail) {
+
+                    if (
+                        typeof data.detail
+                        === "string"
+                    ) {
+
+                        message =
+                            data.detail;
+
+                    } else {
+
+                        message =
+                            JSON.stringify(
+                                data.detail
+                            );
+                    }
+                }
+
+                throw new Error(
+                    message
+                );
+            }
+
+
+            const order =
+                data.chain_order;
+
+
+            const cards =
+                order.map(
+                    target =>
+                        createResultCard(
+                            target,
+                            data.results[
+                                target
+                            ]
+                        )
+                );
+
+
+            document.getElementById(
+                "resultGrid"
+            ).innerHTML =
+                cards.join("");
+
+
+            results.style.display =
+                "block";
+
+
+            results.scrollIntoView({
+                behavior:
+                    "smooth"
+            });
+
+
+        } catch (error) {
+
+            errorBox.textContent =
+                error.message;
+
+            errorBox.style.display =
+                "block";
+
+        } finally {
+
+            loading.style.display =
+                "none";
+
+            button.disabled =
+                false;
+        }
+
+    }
+);
+
+</script>
+
+</body>
+</html>
