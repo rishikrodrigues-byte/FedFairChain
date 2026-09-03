@@ -1,4 +1,5 @@
 from pathlib import Path
+import sys
 
 import joblib
 import numpy as np
@@ -11,6 +12,21 @@ import shap
 # ============================================================
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# ``python app\predictor.py`` places ``app`` on sys.path rather than the
+# repository root. Add the root explicitly so the locked ML contract under
+# src/contracts is available both for direct smoke tests and FastAPI imports.
+if str(BASE_DIR) not in sys.path:
+    sys.path.insert(0, str(BASE_DIR))
+
+from src.contracts.feature_contract import (
+    get_base_features,
+    get_chain_order,
+    get_stage_features,
+    validate_base_dataframe,
+    validate_chain_order,
+    validate_stage_features,
+)
 
 MODEL_PATH = (
     BASE_DIR
@@ -65,13 +81,77 @@ SHAP_FEATURE_NAMES = SHAP_BUNDLE[
 
 
 # ============================================================
-# SAFETY CHECK
+# LOCKED ARTIFACT / FEATURE-CONTRACT CHECK
 # ============================================================
 
-if "SEX" in FEATURES:
-    raise RuntimeError(
-        "SEX must not be used as a prediction feature."
+def _validate_loaded_artifacts():
+    """Fail fast if saved artifacts do not match the locked ML contract."""
+
+    expected_features = get_base_features()
+    expected_order = get_chain_order()
+
+    validate_chain_order(ORDER)
+
+    if FEATURES != expected_features:
+        raise RuntimeError(
+            "Saved model base-feature contract mismatch. "
+            f"Expected {expected_features}, got {FEATURES}."
+        )
+
+    if ORDER != expected_order:
+        raise RuntimeError(
+            "Saved model chain-order contract mismatch. "
+            f"Expected {expected_order}, got {ORDER}."
+        )
+
+    if "SEX" in FEATURES:
+        raise RuntimeError(
+            "SEX must not be used as a prediction feature."
+        )
+
+    preprocessor_names = getattr(
+        PREPROCESSOR,
+        "feature_names_in_",
+        None,
     )
+    if preprocessor_names is not None:
+        observed = list(preprocessor_names)
+        if observed != expected_features:
+            raise RuntimeError(
+                "Saved preprocessor feature order does not match the "
+                f"locked contract. Got {observed}."
+            )
+
+    for target in ORDER:
+        if target not in MODELS:
+            raise RuntimeError(
+                f"Saved model bundle is missing classifier {target}."
+            )
+
+        stage_features = get_stage_features(target)
+        model_n_features = getattr(
+            MODELS[target],
+            "n_features_in_",
+            None,
+        )
+        if model_n_features is not None and int(model_n_features) != len(stage_features):
+            raise RuntimeError(
+                f"{target} classifier expects {model_n_features} features; "
+                f"locked contract requires {len(stage_features)}."
+            )
+
+        if target not in SHAP_FEATURE_NAMES:
+            raise RuntimeError(
+                f"SHAP metadata is missing feature names for {target}."
+            )
+
+        validate_stage_features(
+            target,
+            SHAP_FEATURE_NAMES[target],
+        )
+
+
+_validate_loaded_artifacts()
 
 
 # ============================================================
@@ -156,6 +236,11 @@ def prepare_patient(patient):
         [row],
         columns=FEATURES,
     )
+
+    # This validates feature names and, critically, their order. Missing
+    # numeric values are still permitted here and are handled by the frozen
+    # training-fitted preprocessing pipeline.
+    validate_base_dataframe(patient_df)
 
     return patient_df
 
