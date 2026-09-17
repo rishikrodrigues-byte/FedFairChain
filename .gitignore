@@ -16,3 +16,6 @@ models/
 
 # Generated experiment outputs
 results/
+
+# Local optional prediction history
+data/app/

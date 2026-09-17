@@ -1,4 +1,5 @@
 from pathlib import Path
+import hashlib
 import sys
 
 import joblib
@@ -79,6 +80,42 @@ SHAP_FEATURE_NAMES = SHAP_BUNDLE[
     "feature_names"
 ]
 
+FEATURE_DISPLAY_NAMES = {
+    "AGE": "Age",
+    "BMI": "BMI",
+    "WAIST_CM": "Waist Circumference",
+    "SBP_MEAN": "Systolic Blood Pressure",
+    "DBP_MEAN": "Diastolic Blood Pressure",
+    "HBA1C": "HbA1c",
+    "TOTAL_CHOLESTEROL": "Total Cholesterol",
+    "HDL_CHOLESTEROL": "HDL Cholesterol",
+    "CREATININE": "Creatinine",
+    "BUN": "BUN",
+    "ALBUMIN": "Albumin",
+    "URIC_ACID": "Uric Acid",
+    "SERUM_GLUCOSE": "Serum Glucose",
+    "SMOKING_STATUS": "Smoking Status",
+    "PHYSICAL_ACTIVITY_ANY": "Physical Activity",
+    "DIABETES_CONTEXT": "Diabetes chain context",
+    "CVD_CONTEXT": "CVD chain context",
+}
+
+FEATURE_UNITS = {
+    "AGE": "years",
+    "BMI": "kg/m²",
+    "WAIST_CM": "cm",
+    "SBP_MEAN": "mmHg",
+    "DBP_MEAN": "mmHg",
+    "HBA1C": "%",
+    "TOTAL_CHOLESTEROL": "mg/dL",
+    "HDL_CHOLESTEROL": "mg/dL",
+    "CREATININE": "mg/dL",
+    "BUN": "mg/dL",
+    "ALBUMIN": "g/dL",
+    "URIC_ACID": "mg/dL",
+    "SERUM_GLUCOSE": "mg/dL",
+}
+
 
 # ============================================================
 # LOCKED ARTIFACT / FEATURE-CONTRACT CHECK
@@ -152,6 +189,27 @@ def _validate_loaded_artifacts():
 
 
 _validate_loaded_artifacts()
+
+
+def _sha256_file(path):
+    digest = hashlib.sha256()
+    with open(path, "rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+MODEL_SHA256 = _sha256_file(MODEL_PATH)
+
+# SHAP explainers are relatively expensive to construct. Build them once when
+# the application starts and reuse them for every inference request.
+SHAP_EXPLAINERS = {
+    target: shap.LinearExplainer(
+        MODELS[target],
+        SHAP_BACKGROUNDS[target],
+    )
+    for target in ORDER
+}
 
 
 # ============================================================
@@ -249,66 +307,112 @@ def prepare_patient(patient):
 # SHAP LOCAL EXPLANATION
 # ============================================================
 
+def _relative_strength(rank):
+    if rank == 1:
+        return "Very strong influence"
+    if rank == 2:
+        return "Strong influence"
+    if rank == 3:
+        return "Moderate influence"
+    return "Smaller influence"
+
+
+def _display_value(feature, patient, context_used):
+    if feature.endswith("_CONTEXT"):
+        target = feature.removesuffix("_CONTEXT")
+        item = next(
+            (entry for entry in context_used if entry["target"] == target),
+            None,
+        )
+        if item is None:
+            return None, "Not available", None
+        value = int(item["value"])
+        return value, ("Positive" if value == 1 else "Negative"), None
+
+    value = patient.get(feature)
+    if value is None:
+        return None, "Unavailable — training-fitted imputation used", FEATURE_UNITS.get(feature)
+
+    if feature == "SMOKING_STATUS":
+        labels = {0: "Never smoker", 1: "Former smoker", 2: "Current smoker"}
+        return value, labels.get(value, str(value)), None
+
+    if feature == "PHYSICAL_ACTIVITY_ANY":
+        labels = {0: "No", 1: "Yes"}
+        return value, labels.get(value, str(value)), None
+
+    unit = FEATURE_UNITS.get(feature)
+    return value, f"{value:g}" if isinstance(value, (int, float)) else str(value), unit
+
+
+def explain_all_features(target, X_current, patient, context_used):
+    feature_names = list(SHAP_FEATURE_NAMES[target])
+    explanation = SHAP_EXPLAINERS[target](X_current)
+    values = np.asarray(explanation.values)[0]
+
+    rows = []
+    for feature, value in zip(feature_names, values):
+        raw_value, display_value, unit = _display_value(
+            feature, patient, context_used
+        )
+        rows.append({
+            "feature": feature,
+            "display_name": FEATURE_DISPLAY_NAMES.get(feature, feature),
+            "shap_value": float(value),
+            "absolute_shap": float(abs(value)),
+            "direction": "increases" if value > 0 else "decreases",
+            "direction_label": "upward" if value > 0 else "downward",
+            "is_chain_context": feature.endswith("_CONTEXT"),
+            "patient_value": raw_value,
+            "patient_value_display": display_value,
+            "unit": unit,
+        })
+
+    rows.sort(key=lambda item: item["absolute_shap"], reverse=True)
+    for rank, row in enumerate(rows, start=1):
+        row["relative_rank"] = rank
+        row["relative_strength"] = _relative_strength(rank)
+
+    return rows
+
+
 def explain_prediction(
     target,
     X_current,
     top_n=5,
+    patient=None,
+    context_used=None,
 ):
+    patient = {} if patient is None else patient
+    context_used = [] if context_used is None else context_used
+    return explain_all_features(
+        target, X_current, patient, context_used
+    )[:top_n]
 
-    model = MODELS[target]
 
-    background = (
-        SHAP_BACKGROUNDS[target]
-    )
-
-    feature_names = list(
-        SHAP_FEATURE_NAMES[target]
-    )
-
-    explainer = shap.LinearExplainer(
-        model,
-        background,
-    )
-
-    explanation = explainer(
-        X_current
-    )
-
-    values = np.asarray(
-        explanation.values
-    )[0]
-
-    rows = []
-
-    for feature, value in zip(
-        feature_names,
-        values,
-    ):
-
-        rows.append(
-            {
-                "feature": feature,
-                "shap_value": float(
-                    value
-                ),
-                "absolute_shap": float(
-                    abs(value)
-                ),
-                "direction": (
-                    "increases"
-                    if value > 0
-                    else "decreases"
-                ),
-            }
-        )
-
-    rows.sort(
-        key=lambda item:
-        item["absolute_shap"],
-        reverse=True,
-    )
-
-    return rows[:top_n]
+def get_model_info():
+    return {
+        "project": "FedFairChain",
+        "model_name": "Fairness-aware federated classifier chain",
+        "model_hash_sha256": MODEL_SHA256,
+        "chain_order": list(ORDER),
+        "context_type": "hard_label",
+        "base_feature_count": len(FEATURES),
+        "thresholds": {key: float(value) for key, value in THRESHOLDS.items()},
+        "federated_clients": int(MODEL_BUNDLE.get("num_clients", 4)),
+        "federated_environment": "simulated",
+        "federated_rounds": int(MODEL_BUNDLE.get("federated_rounds", 20)),
+        "best_round": int(MODEL_BUNDLE.get("best_round", 16)),
+        "local_epochs": int(MODEL_BUNDLE.get("local_epochs", 2)),
+        "aggregation": "FedAvg",
+        "fairness_aware": True,
+        "fairness_method": MODEL_BUNDLE.get("fairness_method", "Sex-label reweighing"),
+        "protected_attribute": MODEL_BUNDLE.get("protected_attribute", "SEX"),
+        "protected_attribute_used_for_prediction": False,
+        "diagnosis_aware": True,
+        "explainability": "SHAP",
+        "intended_use": "Research and educational prototype",
+    }
 
 
 # ============================================================
@@ -346,6 +450,30 @@ def predict_patient(
             )
         )
         for target in ORDER
+    }
+
+    provided_features = [
+        feature for feature in FEATURES
+        if patient.get(feature) is not None
+    ]
+    missing_features = [
+        feature for feature in FEATURES
+        if patient.get(feature) is None
+    ]
+    input_completeness = {
+        "provided_count": len(provided_features),
+        "total_count": len(FEATURES),
+        "missing_count": len(missing_features),
+        "provided_features": provided_features,
+        "missing_features": missing_features,
+        "message": (
+            "All model features were supplied."
+            if not missing_features
+            else (
+                f"{len(provided_features)} of {len(FEATURES)} model features were supplied. "
+                "Unavailable values were handled by the frozen training-fitted imputation pipeline."
+            )
+        ),
     }
 
 
@@ -430,6 +558,18 @@ def predict_patient(
                     list(
                         chain_context
                     ),
+
+                "disease_stage": {
+                    "estimated": False,
+                    "message": (
+                        "FedFairChain does not estimate clinical disease stage or severity."
+                    ),
+                },
+
+                "next_steps": [
+                    "Continue following the care and monitoring plan provided by your healthcare professional.",
+                    "Do not start, stop, or change medication based on this application.",
+                ],
             }
 
 
@@ -454,15 +594,40 @@ def predict_patient(
                 prediction
             )
 
-            explanation = (
-                explain_prediction(
-                    target,
-                    X_current,
-                    top_n=(
-                        top_n_explanations
-                    ),
-                )
+            all_explanation = explain_all_features(
+                target,
+                X_current,
+                patient,
+                list(chain_context),
             )
+            explanation = all_explanation[:top_n_explanations]
+            clinical_contributors = [
+                item for item in all_explanation
+                if not item["is_chain_context"]
+            ][:top_n_explanations]
+            context_contributors = [
+                item for item in all_explanation
+                if item["is_chain_context"]
+            ]
+
+            enriched_context = []
+            for context_item in chain_context:
+                context_feature = f"{context_item['target']}_CONTEXT"
+                influence = next(
+                    (item for item in context_contributors if item["feature"] == context_feature),
+                    None,
+                )
+                enriched = dict(context_item)
+                if influence is not None:
+                    enriched.update({
+                        "influence_direction": influence["direction_label"],
+                        "relative_strength": influence["relative_strength"],
+                        "shap_value": influence["shap_value"],
+                    })
+                enriched_context.append(enriched)
+
+            threshold_difference = probability - threshold
+            threshold_position = "above" if prediction == 1 else "below"
 
             results[target] = {
                 "source":
@@ -493,13 +658,60 @@ def predict_patient(
                 "threshold":
                     threshold,
 
+                "threshold_percent":
+                    round(threshold * 100, 2),
+
+                "threshold_difference":
+                    float(threshold_difference),
+
+                "threshold_difference_percent":
+                    round(threshold_difference * 100, 2),
+
+                "threshold_position":
+                    threshold_position,
+
+                "primary_interpretation":
+                    (
+                        "Above model threshold"
+                        if prediction == 1
+                        else "Below model threshold"
+                    ),
+
                 "explanation":
                     explanation,
 
+                "clinical_contributors":
+                    clinical_contributors,
+
+                "chain_context_contributors":
+                    context_contributors,
+
                 "context_used":
-                    list(
-                        chain_context
+                    list(chain_context),
+
+                "context_explanations":
+                    enriched_context,
+
+                "disease_stage": {
+                    "estimated": False,
+                    "message": (
+                        "FedFairChain does not estimate clinical disease stage or severity."
                     ),
+                },
+
+                "next_steps": (
+                    [
+                        "Consider discussing this above-threshold model result with a qualified healthcare professional.",
+                        "A healthcare professional can determine whether clinical assessment or confirmatory testing is appropriate.",
+                        "Do not start, stop, or change medication based on this application.",
+                    ]
+                    if prediction == 1
+                    else [
+                        "A below-threshold model result does not rule out disease.",
+                        "Continue routine health checks and seek professional assessment when appropriate.",
+                        "Do not start, stop, or change medication based on this application.",
+                    ]
+                ),
             }
 
 
@@ -538,6 +750,24 @@ def predict_patient(
     # FINAL RESPONSE
     # ========================================================
 
+    summary_items = []
+    for target in ORDER:
+        result = results[target]
+        if result["source"] == "known":
+            status = f"Known {result['known_status'].lower()} diagnosis supplied"
+        else:
+            status = result["primary_interpretation"]
+        summary_items.append({
+            "target": target,
+            "status": status,
+            "source": result["source"],
+        })
+
+    summary_text = "; ".join(
+        f"{item['target'].title()}: {item['status']}"
+        for item in summary_items
+    )
+
     return {
         "model":
             "FedFairChain",
@@ -550,6 +780,22 @@ def predict_patient(
 
         "sex_used_as_predictor":
             False,
+
+        "model_hash_sha256":
+            MODEL_SHA256,
+
+        "input_completeness":
+            input_completeness,
+
+        "model_summary": {
+            "items": summary_items,
+            "text": summary_text,
+            "safe_percentage_note": (
+                "There is no universal 'safe percentage' in this model. "
+                "Each disease probability is compared with its own learned decision threshold, "
+                "which is a model cutoff and not a medical safety limit."
+            ),
+        },
 
         "results":
             results,

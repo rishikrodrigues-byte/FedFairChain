@@ -1,1300 +1,233 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>FedFairChain</title>
-
-    <style>
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            margin: 0;
-            font-family:
-                Inter,
-                system-ui,
-                -apple-system,
-                BlinkMacSystemFont,
-                "Segoe UI",
-                sans-serif;
-
-            background: #f5f7fb;
-            color: #172033;
-        }
-
-        .topbar {
-            background: #ffffff;
-            border-bottom: 1px solid #e4e8f0;
-            padding: 18px 28px;
-
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
-
-        .brand {
-            font-size: 22px;
-            font-weight: 750;
-        }
-
-        .brand span {
-            color: #3164e0;
-        }
-
-        .research-badge {
-            font-size: 12px;
-            background: #eef3ff;
-            color: #2855c5;
-            padding: 7px 12px;
-            border-radius: 20px;
-            font-weight: 600;
-        }
-
-        .container {
-            max-width: 1180px;
-            margin: 30px auto;
-            padding: 0 20px 60px;
-        }
-
-        .hero {
-            background: white;
-            border: 1px solid #e5e9f1;
-            border-radius: 16px;
-            padding: 28px;
-            margin-bottom: 24px;
-        }
-
-        .hero h1 {
-            margin: 0 0 8px;
-            font-size: 30px;
-        }
-
-        .hero p {
-            margin: 0;
-            color: #637083;
-            line-height: 1.6;
-        }
-
-        .chain {
-            margin-top: 20px;
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-
-        .chain-item {
-            background: #eef3ff;
-            color: #2855c5;
-            font-weight: 700;
-            border-radius: 9px;
-            padding: 8px 13px;
-            font-size: 13px;
-        }
-
-        .arrow {
-            color: #8b96a8;
-            font-weight: bold;
-        }
-
-        .card {
-            background: white;
-            border: 1px solid #e5e9f1;
-            border-radius: 16px;
-            padding: 25px;
-            margin-bottom: 22px;
-        }
-
-        .card-title {
-            font-size: 19px;
-            font-weight: 750;
-            margin-bottom: 4px;
-        }
-
-        .card-subtitle {
-            font-size: 13px;
-            color: #7a8596;
-            margin-bottom: 22px;
-        }
-
-        .section-title {
-            margin-top: 22px;
-            margin-bottom: 14px;
-            font-size: 14px;
-            color: #334055;
-            font-weight: 750;
-            border-bottom: 1px solid #edf0f5;
-            padding-bottom: 8px;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns:
-                repeat(auto-fit, minmax(215px, 1fr));
-            gap: 16px;
-        }
-
-        .field {
-            display: flex;
-            flex-direction: column;
-            gap: 7px;
-        }
-
-        label {
-            font-size: 13px;
-            font-weight: 650;
-            color: #3e495c;
-        }
-
-        input,
-        select {
-            width: 100%;
-            padding: 11px 12px;
-            border-radius: 8px;
-            border: 1px solid #cfd6e2;
-            background: #ffffff;
-            color: #172033;
-            font-size: 14px;
-            outline: none;
-        }
-
-        input:focus,
-        select:focus {
-            border-color: #3164e0;
-            box-shadow: 0 0 0 3px rgba(49, 100, 224, 0.10);
-        }
-
-        .unit {
-            font-size: 11px;
-            color: #8a94a5;
-        }
-
-        .diagnosis-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 16px;
-        }
-
-        .info-box {
-            background: #f7f9fc;
-            border: 1px solid #e4e8ef;
-            padding: 15px;
-            border-radius: 10px;
-            margin-top: 18px;
-            font-size: 13px;
-            color: #657186;
-            line-height: 1.5;
-        }
-
-        .buttons {
-            display: flex;
-            justify-content: center;
-            gap: 12px;
-            margin-top: 25px;
-            flex-wrap: wrap;
-        }
-
-        button {
-            border: 0;
-            border-radius: 9px;
-            padding: 12px 22px;
-            font-size: 14px;
-            font-weight: 700;
-            cursor: pointer;
-        }
-
-        .primary {
-            background: #3164e0;
-            color: white;
-        }
-
-        .primary:hover {
-            background: #2856c7;
-        }
-
-        .secondary {
-            background: #eef1f6;
-            color: #3c4759;
-        }
-
-        button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        #loading {
-            display: none;
-            text-align: center;
-            margin: 25px 0;
-            color: #5f6e83;
-            font-weight: 600;
-        }
-
-        #errorBox {
-            display: none;
-            background: #fff0f0;
-            border: 1px solid #f2bcbc;
-            color: #a52c2c;
-            padding: 14px;
-            border-radius: 10px;
-            margin-top: 18px;
-        }
-
-        #results {
-            display: none;
-        }
-
-        .result-grid {
-            display: grid;
-            grid-template-columns:
-                repeat(3, 1fr);
-            gap: 18px;
-        }
-
-        .result-card {
-            border: 1px solid #e4e8f0;
-            border-radius: 13px;
-            overflow: hidden;
-            background: white;
-        }
-
-        .result-header {
-            padding: 17px;
-            border-bottom: 1px solid #edf0f5;
-        }
-
-        .result-disease {
-            font-weight: 800;
-            font-size: 16px;
-        }
-
-        .result-body {
-            padding: 18px;
-        }
-
-        .probability {
-            font-size: 34px;
-            font-weight: 800;
-            margin: 4px 0;
-        }
-
-        .muted {
-            color: #788497;
-            font-size: 12px;
-        }
-
-        .status {
-            display: inline-block;
-            margin-top: 8px;
-            padding: 6px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 750;
-        }
-
-        .status-positive {
-            background: #ffebeb;
-            color: #bc3333;
-        }
-
-        .status-negative {
-            background: #e9f8ef;
-            color: #297748;
-        }
-
-        .status-known {
-            background: #eef3ff;
-            color: #2855c5;
-        }
-
-        .subheading {
-            margin-top: 19px;
-            margin-bottom: 9px;
-            font-size: 12px;
-            font-weight: 800;
-            color: #546075;
-            text-transform: uppercase;
-            letter-spacing: 0.4px;
-        }
-
-        .contributor {
-            display: flex;
-            justify-content: space-between;
-            gap: 8px;
-            padding: 7px 0;
-            border-bottom: 1px solid #f0f2f6;
-            font-size: 12px;
-        }
-
-        .increase {
-            color: #b94242;
-        }
-
-        .decrease {
-            color: #27734b;
-        }
-
-        .context-item {
-            font-size: 12px;
-            padding: 6px 0;
-            color: #596679;
-        }
-
-        .disclaimer {
-            margin-top: 24px;
-            padding: 17px;
-            border-radius: 11px;
-            background: #fff9e9;
-            border: 1px solid #efe1ad;
-            color: #746329;
-            font-size: 12px;
-            line-height: 1.6;
-        }
-
-        footer {
-            text-align: center;
-            margin-top: 25px;
-            color: #8c96a5;
-            font-size: 12px;
-        }
-
-        @media (max-width: 850px) {
-            .result-grid,
-            .diagnosis-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .topbar {
-                padding: 15px 18px;
-            }
-
-            .hero h1 {
-                font-size: 24px;
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FedFairChain</title>
+<style>
+:root{
+  --bg:#f4f7fb;--surface:#fff;--ink:#182235;--muted:#637083;--line:#dde5ef;
+  --brand:#174b7a;--brand2:#0f6a75;--soft:#eef5fb;--above:#9b4c12;--above-bg:#fff4e8;
+  --below:#1d5c57;--below-bg:#eaf7f4;--known:#5b4b91;--known-bg:#f1eefb;--danger:#9a2f2f;
+  --shadow:0 10px 30px rgba(30,55,90,.08);--radius:18px
+}
+*{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,Segoe UI,Arial,sans-serif;line-height:1.5}
+.wrapper{max-width:1180px;margin:0 auto;padding:30px 18px 56px}.hero{background:linear-gradient(135deg,#123c63,#0f6670);color:#fff;padding:30px;border-radius:24px;box-shadow:var(--shadow);margin-bottom:22px}
+.hero h1{margin:0 0 8px;font-size:clamp(28px,4vw,44px)}.hero p{margin:0;max-width:850px;color:#e8f1f7}.hero-tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}.tag{font-size:12px;padding:6px 9px;border-radius:999px;background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.22)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:24px;margin:18px 0}.card-title{font-size:21px;font-weight:760}.card-subtitle{color:var(--muted);margin-top:4px}.section-title{font-weight:750;margin:24px 0 12px}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.diagnosis-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.field{position:relative}.field label{display:block;font-size:13px;font-weight:700;margin-bottom:6px}.field input,.field select{width:100%;border:1px solid #ccd6e2;border-radius:10px;padding:11px 12px;background:#fff;font:inherit;color:var(--ink);outline:none}.field input:focus,.field select:focus{border-color:#5e8eb6;box-shadow:0 0 0 3px rgba(42,102,151,.12)}.unit{display:block;color:var(--muted);font-size:11px;margin-top:3px}
+.info-box,.safety-box,.plain-note{padding:14px 16px;border-radius:12px;margin-top:16px;background:var(--soft);border:1px solid #d9e8f5;color:#30465c}.safety-box{background:#fff8e8;border-color:#f1dfb5}.buttons{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}.history-options{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:end}.history-check{display:flex;gap:8px;align-items:flex-start;font-size:13px;color:#405268;margin-top:10px}.history-check input{margin-top:3px}.history-panel{display:none}.history-list{display:grid;gap:10px;margin-top:14px}.history-item{border:1px solid var(--line);border-radius:14px;padding:13px}.history-item-head{display:flex;justify-content:space-between;gap:10px;align-items:center}.history-results{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}.history-result{background:#f7f9fc;border-radius:10px;padding:8px;font-size:12px}.history-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.history-note{font-size:12px;color:var(--muted);margin-top:7px}.btn,button{border:0;border-radius:10px;padding:11px 16px;font:inherit;font-weight:700;cursor:pointer}.primary{background:var(--brand);color:#fff}.secondary{background:#edf2f7;color:#24384e}.ghost{background:#fff;border:1px solid var(--line);color:#34485d}button:disabled{opacity:.55;cursor:not-allowed}
+#loading,#results,#errorBox{display:none}#loading{padding:18px;text-align:center;color:var(--brand);font-weight:700}#errorBox{margin-top:15px;padding:12px;border-radius:10px;background:#fff0f0;color:var(--danger);border:1px solid #f3caca}
+.summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:15px}.summary-sentence{margin-top:14px;padding:13px 15px;border-radius:12px;background:#f7f9fc;border:1px solid var(--line);font-weight:650}.summary-mini{border:1px solid var(--line);border-radius:14px;padding:14px}.summary-mini .name{font-weight:750}.summary-mini .state{font-size:13px;margin-top:5px;color:var(--muted)}
+.completeness{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:14px}.completeness strong{font-size:18px}.chip{display:inline-block;padding:5px 9px;border-radius:999px;background:#eef2f6;color:#405268;font-size:12px;margin:2px}
+.result-card{border:1px solid var(--line);border-radius:18px;overflow:hidden;margin:18px 0;background:#fff}.result-head{padding:18px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:10px}.result-head h3{margin:0;font-size:22px}.result-body{padding:20px}.status-pill{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:999px;font-size:12px;font-weight:800}.above{background:var(--above-bg);color:var(--above)}.below{background:var(--below-bg);color:var(--below)}.known{background:var(--known-bg);color:var(--known)}
+.metric-row{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:center}.prob-label{color:var(--muted);font-size:13px}.prob-number{font-size:46px;font-weight:800;line-height:1.05;margin:3px 0}.threshold-line{font-size:14px;color:#435268}.threshold-explain{font-size:13px;color:#4d5d70;margin-top:8px}.probbar{position:relative;height:14px;border-radius:999px;background:#edf1f5;margin:20px 0 8px;overflow:visible}.probfill{height:100%;border-radius:999px;background:linear-gradient(90deg,#3e789e,#146b73)}.threshold-marker{position:absolute;top:-7px;width:2px;height:28px;background:#232d38}.threshold-marker::after{content:"threshold";position:absolute;top:-21px;left:50%;transform:translateX(-50%);font-size:10px;color:#5d6877;white-space:nowrap}.prob-dot{position:absolute;top:50%;width:18px;height:18px;border-radius:50%;background:#152d43;border:3px solid #fff;box-shadow:0 0 0 1px #152d43;transform:translate(-50%,-50%)}.bar-legend{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:12px;color:#536275;margin-top:8px}.bar-legend strong{color:#26384b}
+.explain-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.explain-col{border:1px solid var(--line);border-radius:14px;padding:14px}.explain-col h4{margin:0 0 10px;font-size:15px}.factor{padding:10px 0;border-bottom:1px solid #edf1f5}.factor:last-child{border-bottom:0}.factor-name{font-weight:750}.factor-meta{font-size:13px;color:var(--muted);margin-top:2px}.medical-context{font-size:13px;color:#34485d;margin-top:7px;padding:9px 10px;background:#f6fafc;border-left:3px solid #79a9bf;border-radius:7px}.medical-context strong{color:#1d4056}.up-arrow{color:#9b4c12}.down-arrow{color:#1d5c57}.subheading{font-weight:800;margin:23px 0 9px}.meaning{background:#f7f9fc;border-left:4px solid var(--brand);padding:14px 15px;border-radius:10px}.stage-box{background:#f7f9fc;border:1px solid var(--line);border-radius:12px;padding:13px}.context-item{border:1px solid var(--line);border-radius:12px;padding:12px;margin:8px 0}.context-item strong{display:block}.context-meta{font-size:13px;color:var(--muted)}
+details{border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-top:12px;background:#fbfcfe}summary{cursor:pointer;font-weight:750}.technical{font-size:12px;color:#59687a;margin-top:8px}.next-steps ul{margin:8px 0 0;padding-left:20px}.next-steps li{margin:7px 0}.muted{color:var(--muted)}
+.help-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.help-item{padding:12px;border:1px solid var(--line);border-radius:12px}.help-item strong{display:block;margin-bottom:4px}.federated{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;background:#0f1e2c;color:#d9edf4;border-radius:14px;padding:18px;overflow:auto;white-space:pre}.footer-note{text-align:center;color:var(--muted);font-size:13px;margin-top:22px}
+@media(max-width:800px){.history-options,.history-results{grid-template-columns:1fr!important}.grid,.diagnosis-grid,.summary-grid,.metric-row,.explain-grid,.help-grid{grid-template-columns:1fr}.wrapper{padding:16px 12px 40px}.card{padding:18px}.prob-number{font-size:38px}}
+@page{size:A4 portrait;margin:10mm 10mm 12mm 10mm}
+@media print{
+  html,body{background:#fff!important;font-size:9.3px;line-height:1.30;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .hero,form,.buttons,.footer-note,.advanced-details,.history-panel{display:none!important}
+  .wrapper{max-width:none!important;width:auto!important;padding:0!important;margin:0!important}
+  .card,.result-card{box-shadow:none!important;margin:0 0 6mm 0!important}
+  .card{padding:10px!important}
+  .result-card{padding:0!important;overflow:visible!important;break-inside:auto;page-break-inside:auto}
+  #results>.card:first-child{break-inside:avoid;page-break-inside:avoid}
+  #resultGrid>.result-card{break-before:page;page-break-before:always}
+  #results>.card:last-child{break-inside:avoid;page-break-inside:avoid;padding:7px 9px!important;margin-bottom:0!important}
+  .result-head{padding:8px 10px!important;break-after:avoid;page-break-after:avoid}
+  .result-head h3{font-size:18px!important}
+  .result-body{padding:9px 10px!important}
+  .summary-grid{grid-template-columns:repeat(3,1fr)!important;gap:7px!important}
+  .summary-mini{padding:8px!important}
+  .summary-sentence{padding:8px 10px!important;margin-top:8px!important}
+  .completeness{margin-top:8px!important}
+  .metric-row,.explain-grid{grid-template-columns:1fr 1fr!important;gap:9px!important}
+  .prob-number{font-size:31px!important}
+  .probbar{margin:12px 0 5px!important;height:10px!important}
+  .threshold-marker{height:20px!important;top:-5px!important}
+  .threshold-marker::after{top:-17px!important;font-size:8px!important}
+  .prob-dot{width:14px!important;height:14px!important}
+  .bar-legend{font-size:8.6px!important;margin-top:5px!important}
+  .subheading{margin:9px 0 4px!important;break-after:avoid;page-break-after:avoid}
+  .meaning,.stage-box,.plain-note,.context-item,.safety-box{padding:7px 8px!important;margin-top:5px!important}
+  .explain-col{padding:8px!important}
+  .explain-col h4{margin-bottom:4px!important;font-size:11px!important}
+  .factor{padding:5px 0!important;break-inside:avoid;page-break-inside:avoid}
+  .factor-meta,.medical-context,.context-meta,.threshold-line,.threshold-explain{font-size:8.8px!important}
+  .medical-context{padding:5px 6px!important;margin-top:4px!important}
+  .next-steps ul{margin-top:3px!important;padding-left:16px!important}
+  .next-steps li{margin:2px 0!important}
+  .next-steps li:last-child{display:none!important}
+  #results>.card:last-child .card-subtitle{font-size:8.5px!important;margin-top:2px!important}
+  #results>.card:last-child ul{margin:4px 0 0!important;padding-left:15px!important}
+  #results>.card:last-child li{margin:1.5px 0!important;font-size:8.5px!important;line-height:1.2!important}
+  .meaning,.stage-box,.plain-note,.explain-grid,.context-item,.next-steps,.metric-row{break-inside:avoid;page-break-inside:avoid}
+  .card-title{font-size:17px!important}
+  details{display:none!important}
+}
+</style>
 </head>
-
 <body>
+<div class="wrapper">
+  <section class="hero">
+    <h1>FedFairChain</h1>
+    <p>A research prototype for understandable multi-disease prediction using a fairness-aware federated classifier chain. The tool estimates Diabetes, Cardiovascular Disease, and Hypertension in sequence.</p>
+    <div class="hero-tags"><span class="tag">NHANES</span><span class="tag">Diabetes → CVD → Hypertension</span><span class="tag">4 simulated federated nodes</span><span class="tag">SHAP explainability</span></div>
+  </section>
 
-<div class="topbar">
-    <div class="brand">
-        Fed<span>Fair</span>Chain
+  <form id="patientForm">
+    <section class="card">
+      <div class="card-title">Patient Information</div>
+      <div class="card-subtitle">Age is required. Other unavailable values may be left blank and will be handled by the frozen training-fitted preprocessing pipeline.</div>
+      <div class="section-title">Body measurements</div>
+      <div class="grid">
+        <div class="field"><label>Age</label><input id="AGE" type="number" min="20" max="80" required><span class="unit">years</span></div>
+        <div class="field"><label>BMI</label><input id="BMI" type="number" min="14" max="93" step="0.1"><span class="unit">kg/m²</span></div>
+        <div class="field"><label>Waist Circumference</label><input id="WAIST_CM" type="number" min="55" max="180" step="0.1"><span class="unit">cm</span></div>
+        <div class="field"><label>Systolic Blood Pressure</label><input id="SBP_MEAN" type="number" min="70" max="220" step="0.1"><span class="unit">mmHg</span></div>
+        <div class="field"><label>Diastolic Blood Pressure</label><input id="DBP_MEAN" type="number" min="35" max="145" step="0.1"><span class="unit">mmHg</span></div>
+      </div>
+      <div class="section-title">Laboratory values</div>
+      <div class="grid">
+        <div class="field"><label>HbA1c</label><input id="HBA1C" type="number" min="2.5" max="17" step="0.1"><span class="unit">%</span></div>
+        <div class="field"><label>Total Cholesterol</label><input id="TOTAL_CHOLESTEROL" type="number" min="60" max="450" step="0.1"><span class="unit">mg/dL</span></div>
+        <div class="field"><label>HDL Cholesterol</label><input id="HDL_CHOLESTEROL" type="number" min="5" max="190" step="0.1"><span class="unit">mg/dL</span></div>
+        <div class="field"><label>Creatinine</label><input id="CREATININE" type="number" min="0.2" max="15" step="0.01"><span class="unit">mg/dL</span></div>
+        <div class="field"><label>BUN</label><input id="BUN" type="number" min="1" max="80" step="0.1"><span class="unit">mg/dL</span></div>
+        <div class="field"><label>Albumin</label><input id="ALBUMIN" type="number" min="2" max="5.5" step="0.1"><span class="unit">g/dL</span></div>
+        <div class="field"><label>Uric Acid</label><input id="URIC_ACID" type="number" min="0.5" max="16" step="0.1"><span class="unit">mg/dL</span></div>
+        <div class="field"><label>Serum Glucose</label><input id="SERUM_GLUCOSE" type="number" min="35" max="650" step="0.1"><span class="unit">mg/dL</span></div>
+      </div>
+      <div class="section-title">Lifestyle</div>
+      <div class="grid">
+        <div class="field"><label>Smoking Status</label><select id="SMOKING_STATUS"><option value="">Unknown</option><option value="0">Never smoker</option><option value="1">Former smoker</option><option value="2">Current smoker</option></select></div>
+        <div class="field"><label>Physical Activity</label><select id="PHYSICAL_ACTIVITY_ANY"><option value="">Unknown</option><option value="1">Yes</option><option value="0">No</option></select></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-title">Known Diagnoses</div>
+      <div class="card-subtitle">Only supply a diagnosis if it is already known. FedFairChain will not re-predict a known condition.</div>
+      <div class="diagnosis-grid">
+        <div class="field"><label>Diabetes</label><select id="known_diabetes"><option value="unknown">Unknown</option><option value="yes">Known Positive</option><option value="no">Known Negative</option></select></div>
+        <div class="field"><label>Cardiovascular Disease</label><select id="known_cvd"><option value="unknown">Unknown</option><option value="yes">Known Positive</option><option value="no">Known Negative</option></select></div>
+        <div class="field"><label>Hypertension</label><select id="known_hypertension"><option value="unknown">Unknown</option><option value="yes">Known Positive</option><option value="no">Known Negative</option></select></div>
+      </div>
+      <div class="info-box">Known disease information is inserted into the classifier chain and can influence later stages. Because the chain is Diabetes → CVD → Hypertension, information only moves forward.</div>
+
+      <div class="section-title">Optional Prediction History</div>
+      <div class="card-subtitle">Use an anonymous code such as <strong>P001</strong> if you want to save and revisit this person's model results on this computer. Do not enter a name, phone number, Aadhaar number, or other direct identifier.</div>
+      <div class="history-options" style="margin-top:10px">
+        <div class="field"><label>Anonymous Patient ID</label><input id="patient_id" type="text" maxlength="32" pattern="[A-Za-z0-9_-]+" placeholder="Example: P001"><span class="unit">Letters, numbers, hyphens and underscores only</span></div>
+        <button type="button" class="ghost" onclick="viewHistory()">View Saved History</button>
+      </div>
+      <label class="history-check"><input id="save_history" type="checkbox"><span><strong>Save this prediction locally.</strong> Saved visits can be loaded later for comparison. History is not used to retrain FedFairChain or automatically predict disease progression.</span></label>
+
+      <div class="buttons"><button type="button" class="secondary" onclick="fillExample()">Fill Example</button><button id="analyzeButton" class="primary" type="submit">Analyze Patient</button><button type="button" class="ghost" onclick="resetForm()">Reset</button></div>
+      <div id="errorBox"></div>
+    </section>
+  </form>
+
+  <section id="historyPanel" class="card history-panel">
+    <div class="card-title">Saved Prediction History</div>
+    <div class="card-subtitle">Local visit history for the anonymous Patient ID. Previous results are for comparison only and are not automatically fed into the model.</div>
+    <div id="historyList" class="history-list"></div>
+    <div class="buttons"><button type="button" class="ghost" onclick="closeHistory()">Close History</button><button type="button" class="secondary" onclick="clearHistory()">Delete History for this ID</button></div>
+  </section>
+
+  <div id="loading">Running FedFairChain analysis…</div>
+
+  <section id="results">
+    <div class="card">
+      <div class="card-title">Your Model Assessment</div>
+      <div class="card-subtitle">A plain-language summary of what the model produced. These outputs are not medical diagnoses.</div>
+      <div id="summaryGrid" class="summary-grid"></div>
+      <div id="summarySentence" class="summary-sentence"></div>
+      <div id="inputCompleteness" class="completeness"></div>
+      <div id="historySavedNotice" class="history-note"></div>
+      <div class="safety-box"><strong>Important:</strong> There is no universal “safe percentage” in this model. Each disease has its own learned decision threshold. A threshold is a machine-learning cutoff, not a medical safety limit or disease stage.</div>
+      <div class="buttons"><button type="button" class="ghost" onclick="window.print()">Print Results</button><button type="button" class="secondary" onclick="newPatient()">New Patient</button></div>
     </div>
 
-    <div class="research-badge">
-        Research Prototype
+    <div id="resultGrid"></div>
+
+    <div class="card">
+      <div class="card-title">General Guidance & Safety</div>
+      <div class="card-subtitle">Simple safety guidance for interpreting the result responsibly. This does not replace care from a qualified healthcare professional.</div>
+      <ul>
+        <li>Discuss above-threshold or concerning results with a qualified healthcare professional when appropriate.</li>
+        <li>A below-threshold model result does not rule out disease.</li>
+        <li>Maintain routine health screening, balanced nutrition, appropriate physical activity, and avoid tobacco use.</li>
+        <li>Do not start, stop, or change medication based on this application.</li>
+        <li>If you are experiencing severe or urgent symptoms, seek appropriate emergency medical care instead of relying on this research prediction tool.</li>
+      </ul>
     </div>
+  </section>
+
+  <div class="footer-note">FedFairChain · Fairness-aware federated multi-label prediction research prototype</div>
 </div>
-
-
-<div class="container">
-
-    <div class="hero">
-
-        <h1>
-            Multi-Label Comorbidity Prediction
-        </h1>
-
-        <p>
-            Federated, fairness-aware and explainable prediction
-            for Diabetes, Cardiovascular Disease and Hypertension.
-        </p>
-
-        <div class="chain">
-            <span class="chain-item">DIABETES</span>
-            <span class="arrow">→</span>
-            <span class="chain-item">CVD</span>
-            <span class="arrow">→</span>
-            <span class="chain-item">HYPERTENSION</span>
-        </div>
-
-    </div>
-
-
-    <form id="patientForm">
-
-        <div class="card">
-
-            <div class="card-title">
-                Patient Information
-            </div>
-
-            <div class="card-subtitle">
-                Enter the available clinical and lifestyle values.
-            </div>
-
-
-            <div class="section-title">
-                Demographic & Body Measurements
-            </div>
-
-            <div class="grid">
-
-                <div class="field">
-                    <label>Age *</label>
-
-                    <input
-                        id="AGE"
-                        type="number"
-                        min="20"
-                        max="80"
-                        step="1"
-                        required
-                    >
-
-                    <span class="unit">years</span>
-                </div>
-
-
-                <div class="field">
-                    <label>BMI</label>
-
-                    <input
-                        id="BMI"
-                        type="number"
-                        min="14"
-                        max="93"
-                        step="0.1"
-                    >
-
-                    <span class="unit">kg/m²</span>
-                </div>
-
-
-                <div class="field">
-                    <label>Waist Circumference</label>
-
-                    <input
-                        id="WAIST_CM"
-                        type="number"
-                        min="55"
-                        max="180"
-                        step="0.1"
-                    >
-
-                    <span class="unit">cm</span>
-                </div>
-
-            </div>
-
-
-            <div class="section-title">
-                Blood Pressure
-            </div>
-
-            <div class="grid">
-
-                <div class="field">
-                    <label>Mean Systolic BP</label>
-
-                    <input
-                        id="SBP_MEAN"
-                        type="number"
-                        min="70"
-                        max="220"
-                        step="0.1"
-                    >
-
-                    <span class="unit">mmHg</span>
-                </div>
-
-
-                <div class="field">
-                    <label>Mean Diastolic BP</label>
-
-                    <input
-                        id="DBP_MEAN"
-                        type="number"
-                        min="35"
-                        max="145"
-                        step="0.1"
-                    >
-
-                    <span class="unit">mmHg</span>
-                </div>
-
-            </div>
-
-
-            <div class="section-title">
-                Laboratory Measurements
-            </div>
-
-            <div class="grid">
-
-                <div class="field">
-                    <label>HbA1c</label>
-                    <input id="HBA1C" type="number" min="2.5" max="17" step="0.1">
-                    <span class="unit">%</span>
-                </div>
-
-                <div class="field">
-                    <label>Serum Glucose</label>
-                    <input id="SERUM_GLUCOSE" type="number" min="35" max="650" step="0.1">
-                    <span class="unit">mg/dL</span>
-                </div>
-
-                <div class="field">
-                    <label>Total Cholesterol</label>
-                    <input id="TOTAL_CHOLESTEROL" type="number" min="60" max="450" step="0.1">
-                    <span class="unit">mg/dL</span>
-                </div>
-
-                <div class="field">
-                    <label>HDL Cholesterol</label>
-                    <input id="HDL_CHOLESTEROL" type="number" min="5" max="190" step="0.1">
-                    <span class="unit">mg/dL</span>
-                </div>
-
-                <div class="field">
-                    <label>Creatinine</label>
-                    <input id="CREATININE" type="number" min="0.2" max="15" step="0.01">
-                    <span class="unit">mg/dL</span>
-                </div>
-
-                <div class="field">
-                    <label>BUN</label>
-                    <input id="BUN" type="number" min="1" max="80" step="0.1">
-                    <span class="unit">mg/dL</span>
-                </div>
-
-                <div class="field">
-                    <label>Albumin</label>
-                    <input id="ALBUMIN" type="number" min="2" max="5.5" step="0.1">
-                    <span class="unit">g/dL</span>
-                </div>
-
-                <div class="field">
-                    <label>Uric Acid</label>
-                    <input id="URIC_ACID" type="number" min="0.5" max="16" step="0.1">
-                    <span class="unit">mg/dL</span>
-                </div>
-
-            </div>
-
-
-            <div class="section-title">
-                Lifestyle
-            </div>
-
-            <div class="grid">
-
-                <div class="field">
-                    <label>Smoking Status</label>
-
-                    <select id="SMOKING_STATUS">
-                        <option value="">Unknown</option>
-                        <option value="0">Never smoker</option>
-                        <option value="1">Former smoker</option>
-                        <option value="2">Current smoker</option>
-                    </select>
-                </div>
-
-
-                <div class="field">
-                    <label>Physical Activity</label>
-
-                    <select id="PHYSICAL_ACTIVITY_ANY">
-                        <option value="">Unknown</option>
-                        <option value="1">Yes</option>
-                        <option value="0">No</option>
-                    </select>
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <div class="card">
-
-            <div class="card-title">
-                Known Diagnoses
-            </div>
-
-            <div class="card-subtitle">
-                Provide a diagnosis only when it is already known.
-                Otherwise select Unknown.
-            </div>
-
-
-            <div class="diagnosis-grid">
-
-                <div class="field">
-
-                    <label>Diabetes</label>
-
-                    <select id="known_diabetes">
-                        <option value="unknown">Unknown</option>
-                        <option value="yes">Known Positive</option>
-                        <option value="no">Known Negative</option>
-                    </select>
-
-                </div>
-
-
-                <div class="field">
-
-                    <label>Cardiovascular Disease</label>
-
-                    <select id="known_cvd">
-                        <option value="unknown">Unknown</option>
-                        <option value="yes">Known Positive</option>
-                        <option value="no">Known Negative</option>
-                    </select>
-
-                </div>
-
-
-                <div class="field">
-
-                    <label>Hypertension</label>
-
-                    <select id="known_hypertension">
-                        <option value="unknown">Unknown</option>
-                        <option value="yes">Known Positive</option>
-                        <option value="no">Known Negative</option>
-                    </select>
-
-                </div>
-
-            </div>
-
-
-            <div class="info-box">
-                A known diagnosis is not predicted again.
-                Its known positive or negative value is inserted into
-                the classifier chain and may influence later predictions.
-            </div>
-
-
-            <div class="buttons">
-
-                <button
-                    type="button"
-                    class="secondary"
-                    onclick="fillExample()"
-                >
-                    Fill Example
-                </button>
-
-                <button
-                    id="analyzeButton"
-                    type="submit"
-                    class="primary"
-                >
-                    Analyze Patient
-                </button>
-
-            </div>
-
-
-            <div id="errorBox"></div>
-
-        </div>
-
-    </form>
-
-
-    <div id="loading">
-        Running FedFairChain analysis...
-    </div>
-
-
-    <div id="results">
-
-        <div class="card">
-
-            <div class="card-title">
-                FedFairChain Results
-            </div>
-
-            <div class="card-subtitle">
-                Disease predictions and model-level explanations.
-            </div>
-
-            <div
-                id="resultGrid"
-                class="result-grid"
-            ></div>
-
-            <div class="disclaimer">
-                <strong>Important:</strong>
-                This is a research prototype.
-                Predictions represent outputs of the trained machine-learning
-                model and are not a clinical diagnosis.
-                SHAP values describe model behavior and should not be
-                interpreted as causal medical effects.
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <footer>
-        FedFairChain · Federated Multi-Label Comorbidity Prediction
-    </footer>
-
-</div>
-
-
 <script>
-
-const numericFields = [
-    "AGE",
-    "BMI",
-    "WAIST_CM",
-    "SBP_MEAN",
-    "DBP_MEAN",
-    "HBA1C",
-    "TOTAL_CHOLESTEROL",
-    "HDL_CHOLESTEROL",
-    "CREATININE",
-    "BUN",
-    "ALBUMIN",
-    "URIC_ACID",
-    "SERUM_GLUCOSE"
-];
-
-
-function getNumber(id) {
-
-    const value =
-        document.getElementById(id).value;
-
-    if (value === "") {
-        return null;
-    }
-
-    return Number(value);
-}
-
-
-function getIntegerOrNull(id) {
-
-    const value =
-        document.getElementById(id).value;
-
-    if (value === "") {
-        return null;
-    }
-
-    return parseInt(value);
-}
-
-
-function fillExample() {
-
-    const example = {
-        AGE: 55,
-        BMI: 31.2,
-        WAIST_CM: 104,
-        SBP_MEAN: 148,
-        DBP_MEAN: 92,
-        HBA1C: 7.1,
-        TOTAL_CHOLESTEROL: 215,
-        HDL_CHOLESTEROL: 42,
-        CREATININE: 0.95,
-        BUN: 16,
-        ALBUMIN: 4.1,
-        URIC_ACID: 6.2,
-        SERUM_GLUCOSE: 142
-    };
-
-
-    for (
-        const [key, value]
-        of Object.entries(example)
-    ) {
-
-        document.getElementById(key).value =
-            value;
-    }
-
-
-    document.getElementById(
-        "SMOKING_STATUS"
-    ).value = "1";
-
-
-    document.getElementById(
-        "PHYSICAL_ACTIVITY_ANY"
-    ).value = "1";
-
-
-    document.getElementById(
-        "known_diabetes"
-    ).value = "unknown";
-
-
-    document.getElementById(
-        "known_cvd"
-    ).value = "unknown";
-
-
-    document.getElementById(
-        "known_hypertension"
-    ).value = "unknown";
-}
-
-
-function formatFeature(name) {
-
-    const mapping = {
-        AGE: "Age",
-        BMI: "BMI",
-        WAIST_CM: "Waist Circumference",
-        SBP_MEAN: "Systolic BP",
-        DBP_MEAN: "Diastolic BP",
-        HBA1C: "HbA1c",
-        TOTAL_CHOLESTEROL: "Total Cholesterol",
-        HDL_CHOLESTEROL: "HDL Cholesterol",
-        CREATININE: "Creatinine",
-        BUN: "BUN",
-        ALBUMIN: "Albumin",
-        URIC_ACID: "Uric Acid",
-        SERUM_GLUCOSE: "Serum Glucose",
-        SMOKING_STATUS: "Smoking Status",
-        PHYSICAL_ACTIVITY_ANY: "Physical Activity",
-        DIABETES_CONTEXT: "Diabetes Context",
-        CVD_CONTEXT: "CVD Context"
-    };
-
-    return mapping[name] || name;
-}
-
-
-function formatDisease(target) {
-
-    if (target === "DIABETES") {
-        return "Diabetes";
-    }
-
-    if (target === "CVD") {
-        return "Cardiovascular Disease";
-    }
-
-    if (target === "HYPERTENSION") {
-        return "Hypertension";
-    }
-
-    return target;
-}
-
-
-function createContextHTML(context) {
-
-    if (!context || context.length === 0) {
-
-        return `
-            <div class="muted">
-                No previous chain context.
-            </div>
-        `;
-    }
-
-
-    return context.map(item => {
-
-        const value =
-            item.value === 1
-            ? "Positive"
-            : "Negative";
-
-        return `
-            <div class="context-item">
-                ${formatDisease(item.target)}
-                =
-                <strong>${value}</strong>
-                (${item.source})
-            </div>
-        `;
-
-    }).join("");
-}
-
-
-function createExplanationHTML(explanations) {
-
-    if (
-        !explanations
-        ||
-        explanations.length === 0
-    ) {
-
-        return `
-            <div class="muted">
-                No model explanation because
-                this condition was supplied as known.
-            </div>
-        `;
-    }
-
-
-    return explanations.map(item => {
-
-        const cls =
-            item.direction === "increases"
-            ? "increase"
-            : "decrease";
-
-
-        const arrow =
-            item.direction === "increases"
-            ? "↑"
-            : "↓";
-
-
-        return `
-            <div class="contributor">
-
-                <span>
-                    ${formatFeature(item.feature)}
-                </span>
-
-                <span class="${cls}">
-                    ${arrow}
-                    ${Math.abs(
-                        item.shap_value
-                    ).toFixed(3)}
-                </span>
-
-            </div>
-        `;
-
-    }).join("");
-}
-
-
-function createResultCard(
-    target,
-    result
-) {
-
-    let mainResult = "";
-    let statusClass = "";
-
-
-    if (result.source === "known") {
-
-        statusClass = "status-known";
-
-        mainResult = `
-            <div class="muted">
-                Known diagnosis
-            </div>
-
-            <div class="probability">
-                ${result.known_status}
-            </div>
-
-            <span class="status ${statusClass}">
-                Supplied by user
-            </span>
-        `;
-
-    } else {
-
-        statusClass =
-            result.prediction === "Positive"
-            ? "status-positive"
-            : "status-negative";
-
-
-        mainResult = `
-            <div class="muted">
-                Predicted probability
-            </div>
-
-            <div class="probability">
-                ${result.probability_percent.toFixed(2)}%
-            </div>
-
-            <span class="status ${statusClass}">
-                ${result.prediction}
-            </span>
-
-            <div class="muted" style="margin-top:9px;">
-                Decision threshold:
-                ${(result.threshold * 100).toFixed(0)}%
-            </div>
-        `;
-    }
-
-
-    return `
-        <div class="result-card">
-
-            <div class="result-header">
-                <div class="result-disease">
-                    ${formatDisease(target)}
-                </div>
-            </div>
-
-
-            <div class="result-body">
-
-                ${mainResult}
-
-
-                <div class="subheading">
-                    Chain Context
-                </div>
-
-                ${createContextHTML(
-                    result.context_used
-                )}
-
-
-                <div class="subheading">
-                    Main Model Contributors
-                </div>
-
-                ${createExplanationHTML(
-                    result.explanation
-                )}
-
-            </div>
-
-        </div>
-    `;
-}
-
-
-document
-.getElementById("patientForm")
-.addEventListener(
-    "submit",
-    async function(event) {
-
-        event.preventDefault();
-
-
-        const button =
-            document.getElementById(
-                "analyzeButton"
-            );
-
-        const loading =
-            document.getElementById(
-                "loading"
-            );
-
-        const errorBox =
-            document.getElementById(
-                "errorBox"
-            );
-
-        const results =
-            document.getElementById(
-                "results"
-            );
-
-
-        errorBox.style.display =
-            "none";
-
-        results.style.display =
-            "none";
-
-        loading.style.display =
-            "block";
-
-        button.disabled =
-            true;
-
-
-        const payload = {
-
-            AGE:
-                getNumber("AGE"),
-
-            BMI:
-                getNumber("BMI"),
-
-            WAIST_CM:
-                getNumber("WAIST_CM"),
-
-            SBP_MEAN:
-                getNumber("SBP_MEAN"),
-
-            DBP_MEAN:
-                getNumber("DBP_MEAN"),
-
-            HBA1C:
-                getNumber("HBA1C"),
-
-            TOTAL_CHOLESTEROL:
-                getNumber(
-                    "TOTAL_CHOLESTEROL"
-                ),
-
-            HDL_CHOLESTEROL:
-                getNumber(
-                    "HDL_CHOLESTEROL"
-                ),
-
-            CREATININE:
-                getNumber("CREATININE"),
-
-            BUN:
-                getNumber("BUN"),
-
-            ALBUMIN:
-                getNumber("ALBUMIN"),
-
-            URIC_ACID:
-                getNumber("URIC_ACID"),
-
-            SERUM_GLUCOSE:
-                getNumber(
-                    "SERUM_GLUCOSE"
-                ),
-
-            SMOKING_STATUS:
-                getIntegerOrNull(
-                    "SMOKING_STATUS"
-                ),
-
-            PHYSICAL_ACTIVITY_ANY:
-                getIntegerOrNull(
-                    "PHYSICAL_ACTIVITY_ANY"
-                ),
-
-            known_diabetes:
-                document.getElementById(
-                    "known_diabetes"
-                ).value,
-
-            known_cvd:
-                document.getElementById(
-                    "known_cvd"
-                ).value,
-
-            known_hypertension:
-                document.getElementById(
-                    "known_hypertension"
-                ).value
-        };
-
-
-        try {
-
-            const response =
-                await fetch(
-                    "/predict",
-                    {
-                        method: "POST",
-
-                        headers: {
-                            "Content-Type":
-                                "application/json"
-                        },
-
-                        body:
-                            JSON.stringify(
-                                payload
-                            )
-                    }
-                );
-
-
-            const data =
-                await response.json();
-
-
-            if (!response.ok) {
-
-                let message =
-                    "Prediction failed.";
-
-                if (data.detail) {
-
-                    if (
-                        typeof data.detail
-                        === "string"
-                    ) {
-
-                        message =
-                            data.detail;
-
-                    } else {
-
-                        message =
-                            JSON.stringify(
-                                data.detail
-                            );
-                    }
-                }
-
-                throw new Error(
-                    message
-                );
-            }
-
-
-            const order =
-                data.chain_order;
-
-
-            const cards =
-                order.map(
-                    target =>
-                        createResultCard(
-                            target,
-                            data.results[
-                                target
-                            ]
-                        )
-                );
-
-
-            document.getElementById(
-                "resultGrid"
-            ).innerHTML =
-                cards.join("");
-
-
-            results.style.display =
-                "block";
-
-
-            results.scrollIntoView({
-                behavior:
-                    "smooth"
-            });
-
-
-        } catch (error) {
-
-            errorBox.textContent =
-                error.message;
-
-            errorBox.style.display =
-                "block";
-
-        } finally {
-
-            loading.style.display =
-                "none";
-
-            button.disabled =
-                false;
-        }
-
-    }
-);
-
+const numericFields=["AGE","BMI","WAIST_CM","SBP_MEAN","DBP_MEAN","HBA1C","TOTAL_CHOLESTEROL","HDL_CHOLESTEROL","CREATININE","BUN","ALBUMIN","URIC_ACID","SERUM_GLUCOSE"];
+const allModelFields=[...numericFields,"SMOKING_STATUS","PHYSICAL_ACTIVITY_ANY"];
+let historyRecords=[];
+function anonymousPatientId(){return document.getElementById('patient_id').value.trim()}
+function historyDate(value){try{return new Date(value).toLocaleString()}catch(_){return value}}
+function historyResultText(item){if(!item)return 'Unavailable';if(item.source==='known')return `Known ${String(item.known_status||'').toLowerCase()}`;return `${Number(item.probability_percent).toFixed(2)}% · ${item.primary_interpretation||item.prediction||''}`}
+async function viewHistory(){const id=anonymousPatientId(),errorBox=document.getElementById('errorBox');errorBox.style.display='none';if(!id){errorBox.textContent='Enter an Anonymous Patient ID to view saved history.';errorBox.style.display='block';return}try{const response=await fetch(`/history/${encodeURIComponent(id)}`);const data=await response.json();if(!response.ok)throw new Error(data.detail||'Unable to load history.');historyRecords=data.records||[];const list=document.getElementById('historyList');if(!historyRecords.length){list.innerHTML='<div class="plain-note">No saved predictions were found for this anonymous ID.</div>'}else{list.innerHTML=historyRecords.map((record,index)=>`<div class="history-item"><div class="history-item-head"><strong>Visit ${historyRecords.length-index}</strong><span class="muted">${historyDate(record.created_at)}</span></div><div class="history-results"><div class="history-result"><strong>Diabetes</strong><br>${historyResultText(record.results.DIABETES)}</div><div class="history-result"><strong>Cardiovascular Disease</strong><br>${historyResultText(record.results.CVD)}</div><div class="history-result"><strong>Hypertension</strong><br>${historyResultText(record.results.HYPERTENSION)}</div></div><div class="history-actions"><button type="button" class="ghost" onclick="loadHistoryRecord(${index})">Load these inputs</button></div></div>`).join('')}document.getElementById('historyPanel').style.display='block';document.getElementById('historyPanel').scrollIntoView({behavior:'smooth'})}catch(error){errorBox.textContent=error.message;errorBox.style.display='block'}}
+function loadHistoryRecord(index){const record=historyRecords[index];if(!record)return;allModelFields.forEach(key=>{const el=document.getElementById(key);if(el){const value=record.inputs[key];el.value=(value===null||value===undefined)?'':String(value)}});const known=record.known_diagnoses||{};document.getElementById('known_diabetes').value=known.DIABETES||'unknown';document.getElementById('known_cvd').value=known.CVD||'unknown';document.getElementById('known_hypertension').value=known.HYPERTENSION||'unknown';document.getElementById('save_history').checked=false;document.getElementById('historyPanel').style.display='none';window.scrollTo({top:0,behavior:'smooth'})}
+function closeHistory(){document.getElementById('historyPanel').style.display='none'}
+async function clearHistory(){const id=anonymousPatientId();if(!id)return;if(!window.confirm(`Delete all locally saved prediction history for ${id}?`))return;const response=await fetch(`/history/${encodeURIComponent(id)}`,{method:'DELETE'});const data=await response.json();if(!response.ok){alert(data.detail||'Unable to delete history.');return}historyRecords=[];document.getElementById('historyList').innerHTML=`<div class="plain-note">Deleted ${data.deleted_records} saved record(s) for this anonymous ID.</div>`}
+const featureNames={AGE:"Age",BMI:"BMI",WAIST_CM:"Waist Circumference",SBP_MEAN:"Systolic Blood Pressure",DBP_MEAN:"Diastolic Blood Pressure",HBA1C:"HbA1c",TOTAL_CHOLESTEROL:"Total Cholesterol",HDL_CHOLESTEROL:"HDL Cholesterol",CREATININE:"Creatinine",BUN:"BUN",ALBUMIN:"Albumin",URIC_ACID:"Uric Acid",SERUM_GLUCOSE:"Serum Glucose",SMOKING_STATUS:"Smoking Status",PHYSICAL_ACTIVITY_ANY:"Physical Activity"};
+const featureMedicalContext={
+AGE:"Age is commonly considered when clinicians assess long-term cardiometabolic and cardiovascular health. It is only one part of the overall picture.",
+BMI:"BMI summarizes body weight relative to height. Clinicians may consider it when assessing metabolic and cardiovascular health, but BMI alone does not diagnose disease.",
+WAIST_CM:"Waist circumference is a body-size measure that can reflect central fat distribution and is often considered together with other metabolic-health information.",
+SBP_MEAN:"Systolic blood pressure is the pressure in the arteries when the heart contracts. Clinical interpretation depends on appropriate blood-pressure measurements and the person's overall medical context.",
+DBP_MEAN:"Diastolic blood pressure is the pressure in the arteries between heartbeats. It is interpreted together with systolic pressure and other clinical information.",
+HBA1C:"HbA1c reflects average blood-glucose exposure over roughly the previous two to three months and is commonly used as part of diabetes assessment. This model output is not a diagnosis by itself.",
+TOTAL_CHOLESTEROL:"Total cholesterol is one part of a lipid profile used in cardiovascular assessment. The model's upward or downward direction here must not be interpreted as the value being medically protective or harmful by itself.",
+HDL_CHOLESTEROL:"HDL cholesterol is one component of the lipid profile. Clinical interpretation depends on the full lipid pattern and the person's overall cardiovascular context.",
+CREATININE:"Creatinine is a blood marker commonly considered when assessing kidney function. Clinicians interpret it together with other information rather than as a stand-alone diagnosis.",
+BUN:"BUN is a blood measure related to nitrogenous waste. It is commonly interpreted together with kidney, hydration, and other clinical information.",
+ALBUMIN:"Albumin is a major blood protein. Clinicians may consider it in the context of nutrition, liver function, kidney function, and overall health.",
+URIC_ACID:"Uric acid is a metabolic waste product. Its clinical meaning depends on the wider health context and should not be inferred from this model contribution alone.",
+SERUM_GLUCOSE:"Serum glucose measures blood glucose at the time of testing. Clinical interpretation depends on factors such as timing, fasting status, symptoms, and other tests.",
+SMOKING_STATUS:"Smoking history is relevant to cardiovascular and overall health assessment. The model association shown here does not establish that smoking caused this individual's result.",
+PHYSICAL_ACTIVITY_ANY:"Physical activity is a general lifestyle factor considered in cardiometabolic health. The model's direction is statistical and should not be read as a personal medical judgement."
+};
+const diseaseMedicalContext={
+DIABETES:"Diabetes is assessed clinically using medical history, symptoms, and blood-glucose-related testing. FedFairChain's percentage is a research-model estimate, not a diagnosis, severity grade, or treatment recommendation.",
+CVD:"Cardiovascular disease is a broad group of conditions affecting the heart and blood vessels. In this project, the CVD target represents a composite cardiovascular-history label from NHANES; clinical assessment requires the person's history, symptoms, examination, and appropriate tests.",
+HYPERTENSION:"Hypertension refers to persistently elevated blood pressure and is assessed clinically using appropriate blood-pressure measurements and medical context. In this project, the target is based on NHANES questionnaire/treatment information, so the model percentage is not a blood-pressure stage."
+};
+const diseaseAssessmentContext={
+DIABETES:"A healthcare professional may review symptoms, medical history, HbA1c and/or glucose-related testing when deciding whether further diabetes assessment is needed.",
+CVD:"A healthcare professional may review symptoms, medical history, blood pressure, lipid information, smoking history, examination findings, and other cardiovascular tests when appropriate.",
+HYPERTENSION:"A healthcare professional can interpret blood-pressure measurements over time and decide whether further assessment is needed; one model score cannot establish hypertension or its clinical stage."
+};
+function formatDisease(t){return t==="DIABETES"?"Diabetes":t==="CVD"?"Cardiovascular Disease":t==="HYPERTENSION"?"Hypertension":t}
+function getNumber(id){const v=document.getElementById(id).value;return v===""?null:Number(v)}
+function getIntegerOrNull(id){const v=document.getElementById(id).value;return v===""?null:parseInt(v)}
+function fillExample(){const e={AGE:55,BMI:31.2,WAIST_CM:104,SBP_MEAN:148,DBP_MEAN:92,HBA1C:7.1,TOTAL_CHOLESTEROL:215,HDL_CHOLESTEROL:42,CREATININE:.95,BUN:16,ALBUMIN:4.1,URIC_ACID:6.2,SERUM_GLUCOSE:142};Object.entries(e).forEach(([k,v])=>document.getElementById(k).value=v);document.getElementById("SMOKING_STATUS").value="1";document.getElementById("PHYSICAL_ACTIVITY_ANY").value="1";["known_diabetes","known_cvd","known_hypertension"].forEach(id=>document.getElementById(id).value="unknown")}
+function resetForm(){document.getElementById("patientForm").reset();document.getElementById("results").style.display="none";document.getElementById("historyPanel").style.display="none";document.getElementById("historySavedNotice").textContent="";document.getElementById("errorBox").style.display="none";window.scrollTo({top:0,behavior:"smooth"})}
+function newPatient(){resetForm()}
+function createSummary(data){return data.chain_order.map(t=>{const r=data.results[t];let state="";if(r.source==="known")state=`Known ${r.known_status.toLowerCase()} diagnosis`;else state=r.primary_interpretation;return `<div class="summary-mini"><div class="name">${formatDisease(t)}</div><div class="state">${state}</div>${r.source==="predicted"?`<strong>${r.probability_percent.toFixed(2)}%</strong>`:`<strong>${r.known_status}</strong>`}</div>`}).join("")}
+function createSummarySentence(data){const parts=data.chain_order.map(t=>{const r=data.results[t],name=formatDisease(t);if(r.source==="known")return `${name} was supplied as a known ${r.known_status.toLowerCase()} diagnosis`;return `${name} was ${r.threshold_position} its model threshold (${r.probability_percent.toFixed(2)}% vs ${r.threshold_percent.toFixed(0)}%)`});return `In plain language: ${parts.join('; ')}. These are model outputs, not confirmed diagnoses or disease stages.`}
+function createCompleteness(c){const missing=c.missing_features.map(f=>`<span class="chip">${featureNames[f]||f}</span>`).join("");return `<div><strong>${c.provided_count} / ${c.total_count}</strong> model features supplied<div class="muted">${c.message}</div>${c.missing_count?`<div style="margin-top:6px">Missing: ${missing}</div>`:""}</div>`}
+function createProbabilityBlock(r){const p=r.probability_percent,th=r.threshold_percent,diff=Math.abs(r.threshold_difference_percent);const relation=r.threshold_position==="above"?"above":"below";return `<div class="metric-row"><div><div class="prob-label">MODEL-ESTIMATED PROBABILITY</div><div class="prob-number">${p.toFixed(2)}%</div><span class="status-pill ${relation==='above'?'above':'below'}">${relation==='above'?'▲':'▼'} ${r.primary_interpretation}</span><div class="threshold-explain">This estimate is <strong>${diff.toFixed(2)} percentage points ${relation}</strong> the model cutoff.</div></div><div><div class="threshold-line"><strong>Decision threshold:</strong> ${th.toFixed(0)}%</div><div class="threshold-explain">The threshold is a model decision cutoff — not a medical safety limit.</div><div class="probbar" aria-label="Model estimate ${p.toFixed(2)} percent; decision threshold ${th.toFixed(0)} percent"><div class="probfill" style="width:${Math.max(0,Math.min(100,p))}%"></div><div class="threshold-marker" style="left:${th}%"></div><div class="prob-dot" style="left:${p}%"></div></div><div class="bar-legend"><span>0%</span><span><strong>Threshold:</strong> ${th.toFixed(0)}%</span><span><strong>Model estimate:</strong> ${p.toFixed(2)}%</span><span>100%</span></div></div></div>`}
+function createMeaning(target,r){return `<div class="subheading">What does this result mean?</div><div class="meaning">The model produced an estimated <strong>${formatDisease(target)}</strong> probability of <strong>${r.probability_percent.toFixed(2)}%</strong>. Its configured decision threshold is <strong>${r.threshold_percent.toFixed(0)}%</strong>. Because the estimate is ${r.threshold_position} that cutoff, FedFairChain placed this result <strong>${r.threshold_position} the model threshold</strong>.<br><br><strong>How to read the percentage:</strong> compare it with this disease's model threshold only. It is not a “safety percentage,” a disease stage, or certainty that the condition is present or absent. The threshold was selected during model development to turn model probabilities into class labels; it is not a clinical guideline.<br><br><strong>Medical context:</strong> ${diseaseMedicalContext[target]}<br><br><strong>This output is not a medical diagnosis.</strong></div>`}
+function factorHTML(item){const arrow=item.direction==="increases"?"↑":"↓";const cls=item.direction==="increases"?"up-arrow":"down-arrow";const value=item.unit?`${item.patient_value_display} ${item.unit}`:item.patient_value_display;const medical=featureMedicalContext[item.feature]||"This measurement is interpreted clinically together with the rest of the person's health information.";return `<div class="factor"><div class="factor-name"><span class="${cls}">${arrow}</span> ${item.display_name}</div><div class="factor-meta"><strong>Entered value:</strong> ${value}</div><div class="factor-meta"><strong>Effect in this model:</strong> ${item.relative_strength} · ${item.direction_label} influence</div><div class="medical-context"><strong>Medical context:</strong> ${medical}</div></div>`}
+function createClinicalExplanation(r){const clinical=r.clinical_contributors||r.explanation.filter(x=>!x.is_chain_context);const up=clinical.filter(x=>x.direction==="increases"),down=clinical.filter(x=>x.direction==="decreases");const empty=`<div class="muted">No contributors available.</div>`;return `<div class="subheading">Why did the model produce this result?</div><div class="plain-note"><strong>Model view + medical context:</strong> the factors below had the strongest mathematical influence on this prediction. The arrow tells you only which way the trained model score moved. The medical note explains what the measurement generally represents clinically. A downward model influence does not mean a factor is medically “good,” and an upward influence does not prove it caused disease.</div><div class="explain-grid" style="margin-top:12px"><div class="explain-col"><h4>Factors pushing the model estimate higher</h4>${up.length?up.map(factorHTML).join(""):empty}</div><div class="explain-col"><h4>Factors pushing the model estimate lower</h4>${down.length?down.map(factorHTML).join(""):empty}</div></div>`}
+function createContext(r,target){const context=(r.context_explanations&&r.context_explanations.length)?r.context_explanations:r.context_used;if(!context||!context.length)return `<div class="subheading">Classifier-chain context</div><div class="stage-box">This is the first classifier in the chain. No previous disease result was used.</div>`;const html=context.map(c=>{const value=c.value===1?"Positive":"Negative";const source=c.source==="known"?"Known diagnosis supplied by user":"FedFairChain model prediction";const influence=c.influence_direction?`${c.relative_strength} ${c.influence_direction} model influence`:"Used as chain context";return `<div class="context-item"><strong>${formatDisease(c.target)}: ${value}</strong><div class="context-meta">Source: ${source}</div><div class="context-meta">Effect on this model stage: ${influence}</div></div>`}).join("");return `<div class="subheading">How previous disease results influenced this stage</div><div class="plain-note">Previous classifier-chain outputs are additional machine-learning inputs. They do not prove that one disease medically caused another.</div>${html}`}
+function createNextSteps(target,r){const items=(r.next_steps||[]).slice(0,2);const clinical=diseaseAssessmentContext[target];return `<div class="subheading">What can you do next?</div><div class="next-steps"><ul>${items.map(x=>`<li>${x}</li>`).join("")}${clinical?`<li>${clinical}</li>`:""}<li>Use the General Guidance & Safety section below for overall precautions.</li></ul></div>`}
+function createKnownCard(target,r){return `<article class="result-card"><div class="result-head"><h3>${formatDisease(target)}</h3><span class="status-pill known">✓ Known diagnosis supplied</span></div><div class="result-body"><div class="prob-label">STATUS SUPPLIED BY USER</div><div class="prob-number" style="font-size:34px">${r.known_status}</div><div class="meaning">FedFairChain did not re-predict this condition, so no model probability or SHAP explanation is shown for it. The supplied status was passed forward to later classifier-chain stages where applicable.<br><br><strong>Medical context:</strong> ${diseaseMedicalContext[target]}</div><div class="subheading">Clinical stage / severity</div><div class="stage-box"><strong>Not estimated by FedFairChain.</strong> ${r.disease_stage.message} Clinical stage requires disease-specific medical assessment.</div>${createNextSteps(target,r)}</div></article>`}
+function createAdvancedDetails(r){const shap=(r.explanation||[]).map(x=>`${x.display_name||x.feature}: ${x.shap_value>=0?'+':''}${x.shap_value.toFixed(3)}`).join("<br>");return `<details class="advanced-details"><summary>Optional: technical model math</summary><div class="technical">This section is for technical users and is not required to understand the result.<br><br><strong>Technical classification:</strong> ${r.prediction}<br><strong>Model probability:</strong> ${(r.probability*100).toFixed(2)}%<br><strong>Decision threshold:</strong> ${(r.threshold*100).toFixed(0)}%<br><br><strong>SHAP contributions:</strong><br>${shap}<br><br>SHAP values are mathematical contributions to the model's internal score. They are not percentages and do not represent causal medical effects.</div></details>`}
+function createPredictedCard(target,r){return `<article class="result-card"><div class="result-head"><h3>${formatDisease(target)}</h3><span class="status-pill ${r.threshold_position==='above'?'above':'below'}">${r.primary_interpretation}</span></div><div class="result-body">${createProbabilityBlock(r)}${createMeaning(target,r)}<div class="subheading">Clinical stage / severity</div><div class="stage-box"><strong>Not estimated by FedFairChain.</strong> ${r.disease_stage.message} A higher model percentage must not be interpreted as a more advanced disease stage.</div>${createClinicalExplanation(r)}${createContext(r,target)}${createNextSteps(target,r)}${createAdvancedDetails(r)}</div></article>`}
+function createResultCard(target,r){return r.source==="known"?createKnownCard(target,r):createPredictedCard(target,r)}
+document.getElementById('patientForm').addEventListener('submit',async function(event){event.preventDefault();const button=document.getElementById('analyzeButton'),loading=document.getElementById('loading'),errorBox=document.getElementById('errorBox'),results=document.getElementById('results');errorBox.style.display='none';results.style.display='none';loading.style.display='block';button.disabled=true;const payload={AGE:getNumber('AGE'),BMI:getNumber('BMI'),WAIST_CM:getNumber('WAIST_CM'),SBP_MEAN:getNumber('SBP_MEAN'),DBP_MEAN:getNumber('DBP_MEAN'),HBA1C:getNumber('HBA1C'),TOTAL_CHOLESTEROL:getNumber('TOTAL_CHOLESTEROL'),HDL_CHOLESTEROL:getNumber('HDL_CHOLESTEROL'),CREATININE:getNumber('CREATININE'),BUN:getNumber('BUN'),ALBUMIN:getNumber('ALBUMIN'),URIC_ACID:getNumber('URIC_ACID'),SERUM_GLUCOSE:getNumber('SERUM_GLUCOSE'),SMOKING_STATUS:getIntegerOrNull('SMOKING_STATUS'),PHYSICAL_ACTIVITY_ANY:getIntegerOrNull('PHYSICAL_ACTIVITY_ANY'),known_diabetes:document.getElementById('known_diabetes').value,known_cvd:document.getElementById('known_cvd').value,known_hypertension:document.getElementById('known_hypertension').value,patient_id:anonymousPatientId()||null,save_history:document.getElementById('save_history').checked};if(payload.save_history&&!payload.patient_id){errorBox.textContent='Enter an Anonymous Patient ID before saving prediction history.';errorBox.style.display='block';loading.style.display='none';button.disabled=false;return}try{const response=await fetch('/predict',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});const data=await response.json();if(!response.ok){throw new Error(typeof data.detail==='string'?data.detail:JSON.stringify(data.detail||'Prediction failed.'))}document.getElementById('summaryGrid').innerHTML=createSummary(data);document.getElementById('summarySentence').textContent=createSummarySentence(data);document.getElementById('inputCompleteness').innerHTML=createCompleteness(data.input_completeness);document.getElementById('historySavedNotice').textContent=data.history_saved?`Saved locally for anonymous ID ${payload.patient_id}. Record #${data.history_record_id}. This history is not used for model training.`:'';document.getElementById('resultGrid').innerHTML=data.chain_order.map(t=>createResultCard(t,data.results[t])).join('');results.style.display='block';results.scrollIntoView({behavior:'smooth'})}catch(error){errorBox.textContent=error.message;errorBox.style.display='block'}finally{loading.style.display='none';button.disabled=false}});
 </script>
-
 </body>
 </html>
